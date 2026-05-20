@@ -193,7 +193,7 @@ const WhyAdoptSection = () => {
                         </div>
 
                         {/* CTA Button */}
-                        <Link href="/adopt">
+                        <Link href="/all-pets">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}

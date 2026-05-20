@@ -78,7 +78,7 @@ const BenefitsSection = () => {
   return (
     <section className="relative py-20 md:py-28 overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30" />
+      <div className="absolute inset-0 bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30" />
 
       {/* Decorative blobs */}
       <div className="absolute top-20 right-10 w-64 h-64 bg-teal-200/30 dark:bg-teal-500/10 rounded-full blur-3xl animate-float" />
@@ -242,7 +242,7 @@ const BenefitsSection = () => {
 
         {/* Mobile Badge */}
         <div className="lg:hidden text-center mt-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-100 to-emerald-100 dark:from-teal-900/50 dark:to-emerald-900/50 rounded-full">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-teal-100 to-emerald-100 dark:from-teal-900/50 dark:to-emerald-900/50 rounded-full">
             <PawPrint
               size={16}
               className="text-teal-600 dark:text-teal-400"

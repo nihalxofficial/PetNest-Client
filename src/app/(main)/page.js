@@ -1,6 +1,7 @@
 import BenefitsSection from "@/components/BenefitsSection";
 import FeaturedPetsSection from "@/components/FeaturedSection";
 import HeroSection from "@/components/HeroSection";
+import SuccessStoriesSection from "@/components/SuccessStories";
 import WhyAdoptSection from "@/components/WhyAdoptSection";
 
 export default function Home() {
@@ -10,6 +11,7 @@ export default function Home() {
       <BenefitsSection />
       <FeaturedPetsSection/>
       <WhyAdoptSection/>
+      <SuccessStoriesSection/>
     </>
   );
 }

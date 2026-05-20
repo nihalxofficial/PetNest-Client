@@ -134,7 +134,7 @@ const FeaturedPetsSection = () => {
   return (
     <section className="relative py-20 md:py-28 overflow-hidden">
       {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30" />
+      <div className="absolute inset-0 bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30" />
 
       {/* Decorative blobs */}
       <div className="absolute top-20 right-10 w-64 h-64 bg-teal-200/30 dark:bg-teal-500/10 rounded-full blur-3xl animate-float" />
@@ -262,7 +262,7 @@ const FeaturedPetsSection = () => {
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-teal-600 to-emerald-500 dark:from-teal-500 dark:to-emerald-400 shadow-md hover:shadow-lg transition-all duration-300"
+                          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-white bg-linear-to-r from-teal-600 to-emerald-500 dark:from-teal-500 dark:to-emerald-400 shadow-md hover:shadow-lg transition-all duration-300"
                         >
                           <ShoppingBag size={16} />
                           Adopt Now
