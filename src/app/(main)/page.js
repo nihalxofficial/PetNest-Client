@@ -1,5 +1,6 @@
 import AdoptionProcessSection from "@/components/AdoptionProcess";
 import BenefitsSection from "@/components/BenefitsSection";
+import EmergencySupportSection from "@/components/EmergencySupport";
 import FeaturedPetsSection from "@/components/FeaturedSection";
 import HeroSection from "@/components/HeroSection";
 import PetCareTipsSection from "@/components/PetCareTips";
@@ -16,6 +17,7 @@ export default function Home() {
       <SuccessStoriesSection/>
       <PetCareTipsSection/>
       <AdoptionProcessSection/>
+      <EmergencySupportSection/>
     </>
   );
 }
