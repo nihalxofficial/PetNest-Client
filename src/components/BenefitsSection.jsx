@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import benefitImg from "@/assets/benefit.png"
+import benefitImg from "@/assets/benefits.jpg"
 import {
   Heart,
   PawPrint,
@@ -120,16 +120,17 @@ const BenefitsSection = () => {
               viewport={{ once: true }}
               className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
             >
-              <div className="w-56 h-56 rounded-full overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800">
-                {/* Image - Replace the src with your own image path */}
-                <Image
-                  src={benefitImg}
-                  alt="Happy pet"
-                  width={600}
-                  height={600}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <div className="relative w-60 h-60 rounded-full overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800">
+  <Image
+    src={benefitImg}
+    alt="Happy pet"
+    width={600}
+    height={600}
+    className="w-full h-full object-cover"
+  />
+  {/* Theme-aware gradient overlay */}
+  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent dark:from-black/60 dark:via-black/20" />
+</div>
             </motion.div>
 
             {/* Circular Cards */}

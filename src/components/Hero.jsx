@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { PawPrint, ArrowRight, Heart, Shield, Calendar, Users } from "lucide-react";
-import HeroImg from "@/assets/hero-2.png"
+import HeroImg from "@/assets/hero.png"
 
 const HeroSection = () => {
   const stats = [
