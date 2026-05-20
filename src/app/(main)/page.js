@@ -1,6 +1,7 @@
 import BenefitsSection from "@/components/BenefitsSection";
 import FeaturedPetsSection from "@/components/FeaturedSection";
-import HeroSection from "@/components/Hero";
+import HeroSection from "@/components/HeroSection";
+import WhyAdoptSection from "@/components/WhyAdoptSection";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
       <HeroSection />
       <BenefitsSection />
       <FeaturedPetsSection/>
+      <WhyAdoptSection/>
     </>
   );
 }

@@ -111,7 +111,7 @@ const BenefitsSection = () => {
         {/* Benefits Layout */}
         <div className="relative max-w-6xl mx-auto">
           {/* Desktop Circular Layout */}
-          <div className="hidden lg:block relative min-h-[700px]">
+          <div className="hidden lg:block relative min-h-175">
             {/* Center Circle with Image */}
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
@@ -121,16 +121,16 @@ const BenefitsSection = () => {
               className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
             >
               <div className="relative w-60 h-60 rounded-full overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800">
-  <Image
-    src={benefitImg}
-    alt="Happy pet"
-    width={600}
-    height={600}
-    className="w-full h-full object-cover"
-  />
-  {/* Theme-aware gradient overlay */}
-  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent dark:from-black/60 dark:via-black/20" />
-</div>
+                <Image
+                  src={benefitImg}
+                  alt="Happy pet"
+                  width={600}
+                  height={600}
+                  className="w-full h-full object-cover"
+                />
+                {/* Theme-aware gradient overlay */}
+                <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent dark:from-black/60 dark:via-black/20" />
+              </div>
             </motion.div>
 
             {/* Circular Cards */}

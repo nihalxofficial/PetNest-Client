@@ -282,7 +282,7 @@ const FeaturedPetsSection = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 border-teal-500 text-teal-700 dark:border-teal-400 dark:text-teal-400 font-semibold hover:bg-teal-50 dark:hover:bg-teal-950/30 transition-all duration-300"
+              className="inline-flex cursor-pointer items-center gap-2 px-6 py-3 rounded-full border-2 border-teal-500 text-teal-700 dark:border-teal-400 dark:text-teal-400 font-semibold hover:bg-teal-50 dark:hover:bg-teal-950/30 transition-all duration-300"
             >
               View All Pets
               <PawPrint size={16} />
