@@ -1,4 +1,3 @@
-// components/PetCareTipsSection.jsx
 "use client";
 
 import React from "react";
@@ -86,7 +85,7 @@ const PetCareTipsSection = () => {
   return (
     <section className="relative py-20 md:py-28 overflow-hidden">
       {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30" />
+      <div className="absolute inset-0 bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30" />
 
       {/* Decorative blobs */}
       <div className="absolute top-20 left-10 w-64 h-64 bg-teal-200/30 dark:bg-teal-500/10 rounded-full blur-3xl animate-float" />

@@ -1,10 +1,8 @@
-// components/SuccessStoriesSection.jsx
 "use client";
 
 import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
 import Marquee from "react-fast-marquee";
 import {
     Heart,
@@ -182,10 +180,10 @@ const SuccessStoriesSection = () => {
                                                         {story.name}
                                                     </h4>
                                                     <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                                        <MapPin size={10} className="flex-shrink-0" />
+                                                        <MapPin size={10} className="shrink-0" />
                                                         <span className="truncate">{story.location}</span>
                                                         <span className="mx-0.5">•</span>
-                                                        <Calendar size={10} className="flex-shrink-0" />
+                                                        <Calendar size={10} className="shrink-0" />
                                                         <span className="truncate">{story.date}</span>
                                                     </div>
                                                 </div>
