@@ -24,12 +24,13 @@ const PetNestNavbar = () => {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 
     const menuItems = [
         { name: "Home", href: "/", icon: Home },
-        { name: "All Pets", href: "/pets", icon: PawPrint },
+        { name: "All Pets", href: "/all-pets", icon: PawPrint },
         { name: "Add Pet", href: "/add-pet", icon: Plus },
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     ];
