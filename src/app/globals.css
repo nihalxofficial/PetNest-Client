@@ -1,18 +1,14 @@
 @import "tailwindcss";
 @import "@heroui/styles"; 
 
-
-/* Force the font on everything */
 * {
   font-family: 'Josefin Sans', sans-serif !important;
 }
 
-/* Or specifically on body */
 body {
   font-family: 'Josefin Sans', sans-serif !important;
 }
 
-/* Your other styles */
 .bg-linear-r {
   background-image: linear-gradient(to right, var(--tw-gradient-stops));
 }

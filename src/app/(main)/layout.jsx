@@ -1,3 +1,4 @@
+import Footer from "@/components/Footer";
 import PetNestNavbar from "@/components/Navbar";
 import { Josefin_Sans } from "next/font/google";
 
@@ -11,6 +12,7 @@ const MainLayout = ({children}) => {
         <div className={josefin.className}>
             <PetNestNavbar/>
             {children}
+            <Footer/>
             
         </div>
     );
