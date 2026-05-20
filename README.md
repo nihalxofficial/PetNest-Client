@@ -14,6 +14,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - React Toast
 - JWT
 - React Icons
+- Gravity Ui Icons
 - Framer Motion
 - Lucide React
 - Marquee
