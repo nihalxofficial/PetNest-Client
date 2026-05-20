@@ -53,10 +53,10 @@ const HeroSection = () => {
                 <span className="bg-linear-to-r from-teal-300 to-emerald-300 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent">
                   furry companion
                 </span>{" "}
-                today.
+                today !
               </h1>
               <p className="text-gray-200 dark:text-gray-200 text-lg mt-4 max-w-lg mx-auto lg:mx-0">
-                Adopt loving pets, connect with shelters, and give animals the caring home they deserve.
+                Adopt loving pets, connect with shelters and give animals the caring home they deserve.
               </p>
               
               <div className="flex flex-wrap gap-4 mt-8 justify-center lg:justify-start">
