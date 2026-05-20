@@ -2,6 +2,27 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## Tech Stack
+- Html5
+- TailwindCSS
+- JS ES6
+- Hero Ui
+- React
+- Next.js
+- Better Auth
+- Mongodb Atlas
+- React Toast
+- JWT
+- React Icons
+- Framer Motion
+- Lucide React
+
+## Topics
+- Authentication
+- Authorization
+- Rest api
+- Social Login
+
 First, run the development server:
 
 ```bash
