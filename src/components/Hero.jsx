@@ -1,4 +1,3 @@
-// components/HeroSection.jsx
 "use client";
 
 import React from "react";
@@ -6,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { PawPrint, ArrowRight, Heart, Shield, Calendar, Users } from "lucide-react";
-import HeroImg from "@/assets/Hero.png"
+import HeroImg from "@/assets/hero-2.png"
 
 const HeroSection = () => {
   const stats = [
@@ -32,7 +31,7 @@ const HeroSection = () => {
       
       <div className="absolute inset-0 z-10 bg-linear-to-br from-teal-900/70 via-teal-800/50 to-emerald-900/70 dark:from-teal-950/80 dark:via-gray-900/70 dark:to-emerald-950/80" />
       
-      <div className="absolute inset-0 z-10 bg-black/20 dark:bg-black/40" />
+      {/* <div className="absolute inset-0 z-10 bg-black/20 dark:bg-black/40" /> */}
       
       <div className="absolute top-20 left-10 w-72 h-72 bg-teal-500/20 dark:bg-teal-400/10 rounded-full blur-3xl animate-float z-10" />
       <div className="absolute bottom-10 right-10 w-80 h-80 bg-emerald-500/20 dark:bg-emerald-400/10 rounded-full blur-3xl animate-float-delayed z-10" />

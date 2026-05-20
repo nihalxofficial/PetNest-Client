@@ -131,7 +131,7 @@ const PetNestNavbar = () => {
                             </motion.button>
                         </Link>
 
-\                        <motion.button
+                        <motion.button
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className="lg:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800"

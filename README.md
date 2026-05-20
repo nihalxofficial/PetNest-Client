@@ -22,6 +22,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - Authorization
 - Rest api
 - Social Login
+- Theme Toggle
 
 First, run the development server:
 

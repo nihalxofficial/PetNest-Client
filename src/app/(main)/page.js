@@ -1,8 +1,11 @@
+import BenefitsSection from "@/components/BenefitsSection";
 import HeroSection from "@/components/Hero";
-import Image from "next/image";
 
 export default function Home() {
   return (
-    <HeroSection/>
+    <>
+      <HeroSection />
+      <BenefitsSection />
+    </>
   );
 }
