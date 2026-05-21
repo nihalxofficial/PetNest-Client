@@ -31,6 +31,7 @@ import Image from "next/image";
 import { getPets } from "@/lib/pets/data";
 import SearchBar from "@/components/SearchBar";
 import { useSearchParams } from "next/navigation";
+import TabFilter from "@/components/TabFilter";
 
 const AllPetsPage = () => {
 
@@ -40,8 +41,8 @@ const AllPetsPage = () => {
     const [priceRange, setPriceRange] = useState([0, 200]);
     const [sortBy, setSortBy] = useState("price_low");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState("All");
     const [isSortOpen, setIsSortOpen] = useState(false);
+
 
     const sortOptions = [
         { id: "price_low", label: "Price: Low to High" },
@@ -71,8 +72,11 @@ const AllPetsPage = () => {
     const searchParams = useSearchParams();
     useEffect(() => {
         const fetchPets = async () => {
-            // const data = await getPets(searchParams.get("search"));
-            const data = await getPets({ search: searchParams.get("search") || "" });
+            const data = await getPets({
+                search: searchParams.get("search") || "",
+                species: searchParams.get("species") || "",
+                // fee: searchParams.get("fee") || "",
+            });
             setPetsData(data)
         }
 
@@ -97,7 +101,7 @@ const AllPetsPage = () => {
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
 
-                        <SearchBar/>
+                        <SearchBar />
 
                         <div className="flex flex-wrap gap-3 items-center">
                             <div className="md:hidden">
@@ -276,20 +280,7 @@ const AllPetsPage = () => {
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                                 Showing {petsData.length} pets
                             </p>
-                            <div className="flex gap-1 bg-teal-100 dark:bg-teal-900/50 rounded-full p-1">
-                                {["All", "Dogs", "Cats", "Others"].map((tab) => (
-                                    <button
-                                        key={tab}
-                                        onClick={() => setActiveTab(tab)}
-                                        className={`px-4 py-1.5 text-sm rounded-full transition-all ${activeTab === tab
-                                            ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-sm"
-                                            : "text-gray-700 dark:text-gray-300 hover:bg-teal-200 dark:hover:bg-teal-800/50"
-                                            }`}
-                                    >
-                                        {tab}
-                                    </button>
-                                ))}
-                            </div>
+                            <TabFilter />
                         </div>
 
                         {/* Grid View */}
