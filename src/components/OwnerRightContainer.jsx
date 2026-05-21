@@ -213,7 +213,7 @@ const OwnerRightContainer = ({ petData }) => {
                                                         </Label>
                                                         <TextArea
                                                             className="w-full"
-                                                            placeholder="Describe the pet's personality, behavior, and special needs..."
+                                                            placeholder="Describe the pet's personality, behavior and special needs..."
                                                             rows={4}
                                                         />
                                                     </TextField>

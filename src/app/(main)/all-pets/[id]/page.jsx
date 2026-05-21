@@ -39,11 +39,12 @@ const PetDetailsPage = async ({ params }) => {
     const session = await auth.api.getSession({
         headers: await headers()
     })
-
     const user = session?.user;
 
     const ownerID = petData?.ownerID;
     const owner = await getUserById(ownerID);
+
+    const isOwner = user?.email === owner?.email;
 
     return (
         <div className="min-h-screen bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30 py-8 px-4 sm:px-6 lg:px-8">
@@ -257,8 +258,10 @@ const PetDetailsPage = async ({ params }) => {
 
                     {/* Right Column - Adoption Form */}
                     <div className="lg:w-96">
-                        <OwnerRightContainer petData={petData} />
-                        {/* <AdoptionForm petId={petId} petData={petData} />                                             */}
+                    {
+                        isOwner ? <OwnerRightContainer petData={petData} />
+                        : <AdoptionForm id={id} petData={petData} user={user} />                                            
+                    }
                     </div>
                 </div>
             </div>
