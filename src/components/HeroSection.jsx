@@ -64,7 +64,7 @@ const HeroSection = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 bg-linear-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-semibold rounded-full px-8 py-3.5 shadow-md hover:shadow-lg transition-all duration-300"
+                    className="flex cursor-pointer items-center gap-2 bg-linear-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-semibold rounded-full px-8 py-3.5 shadow-md hover:shadow-lg transition-all duration-300"
                   >
                     Adopt Now
                     <ArrowRight size={18} />
@@ -74,9 +74,9 @@ const HeroSection = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 border-2 border-white text-white font-semibold rounded-full px-8 py-3.5 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+                    className="flex cursor-pointer items-center gap-2 border-2 border-white text-white font-semibold rounded-full px-8 py-3.5 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
                   >
-                    Explore Pets
+                    About Pets
                   </motion.button>
                 </Link>
               </div>

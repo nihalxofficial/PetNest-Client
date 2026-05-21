@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Button,
     Card,
@@ -28,102 +28,22 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-
-const petsData = [
-    {
-        id: 1,
-        name: "Luna",
-        species: "Dog",
-        breed: "Golden Retriever",
-        age: "2 years",
-        location: "Austin, TX",
-        vaccinated: true,
-        fee: 85,
-        image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&h=300&fit=crop",
-        gender: "Female",
-        size: "Large",
-    },
-    {
-        id: 2,
-        name: "Oliver",
-        species: "Cat",
-        breed: "Maine Coon",
-        age: "1.5 years",
-        location: "Denver, CO",
-        vaccinated: true,
-        fee: 70,
-        image: "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=400&h=300&fit=crop",
-        gender: "Male",
-        size: "Large",
-    },
-    {
-        id: 3,
-        name: "Sunny",
-        species: "Bird",
-        breed: "Cockatiel",
-        age: "8 months",
-        location: "Seattle, WA",
-        vaccinated: true,
-        fee: 45,
-        image: "https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400&h=300&fit=crop",
-        gender: "Male",
-        size: "Small",
-    },
-    {
-        id: 4,
-        name: "Coco",
-        species: "Rabbit",
-        breed: "Holland Lop",
-        age: "1 year",
-        location: "Portland, OR",
-        vaccinated: true,
-        fee: 50,
-        image: "https://images.unsplash.com/photo-1535241749838-299277b6305f?w=400&h=300&fit=crop",
-        gender: "Female",
-        size: "Small",
-    },
-    {
-        id: 5,
-        name: "Rocky",
-        species: "Dog",
-        breed: "German Shepherd",
-        age: "3 years",
-        location: "Chicago, IL",
-        vaccinated: true,
-        fee: 95,
-        image: "https://images.unsplash.com/photo-1568572933382-74d440642117?w=400&h=300&fit=crop",
-        gender: "Male",
-        size: "Large",
-    },
-    {
-        id: 6,
-        name: "Mochi",
-        species: "Cat",
-        breed: "Ragdoll",
-        age: "6 months",
-        location: "San Diego, CA",
-        vaccinated: true,
-        fee: 120,
-        image: "https://images.unsplash.com/photo-1583511655826-05700d52f4d9?w=400&h=300&fit=crop",
-        gender: "Female",
-        size: "Medium",
-    },
-];
+import { getPets } from "@/lib/pets/data";
+import SearchBar from "@/components/SearchBar";
+import { useSearchParams } from "next/navigation";
 
 const AllPetsPage = () => {
+
     const [viewMode, setViewMode] = useState("grid");
     const [selectedSpecies, setSelectedSpecies] = useState([]);
     const [selectedSize, setSelectedSize] = useState([]);
     const [priceRange, setPriceRange] = useState([0, 200]);
-    const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState("price_low");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("All");
     const [isSortOpen, setIsSortOpen] = useState(false);
 
     const sortOptions = [
-        { id: "newest", label: "Newest First" },
-        { id: "oldest", label: "Oldest First" },
         { id: "price_low", label: "Price: Low to High" },
         { id: "price_high", label: "Price: High to Low" },
         { id: "name_asc", label: "Name: A to Z" },
@@ -147,6 +67,19 @@ const AllPetsPage = () => {
         );
     };
 
+    const [petsData, setPetsData] = useState([])
+    const searchParams = useSearchParams();
+    useEffect(() => {
+        const fetchPets = async () => {
+            // const data = await getPets(searchParams.get("search"));
+            const data = await getPets({ search: searchParams.get("search") || "" });
+            setPetsData(data)
+        }
+
+        fetchPets()
+    }, [searchParams])
+
+
     return (
         <div className="min-h-screen bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -163,19 +96,8 @@ const AllPetsPage = () => {
                 {/* Search and Sort Bar */}
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                        <div className="w-full md:w-80 relative">
-                            <input
-                                type="text"
-                                placeholder="Search pets..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all text-sm"
-                            />
-                            <Search
-                                size={16}
-                                className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                            />
-                        </div>
+
+                        <SearchBar/>
 
                         <div className="flex flex-wrap gap-3 items-center">
                             <div className="md:hidden">
@@ -219,8 +141,8 @@ const AllPetsPage = () => {
                                 <button
                                     onClick={() => setViewMode("grid")}
                                     className={`p-2.5 rounded-full transition-all cursor-pointer ${viewMode === "grid"
-                                            ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-md"
-                                            : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400"
+                                        ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-md"
+                                        : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400"
                                         }`}
                                 >
                                     <Grid3x3 size={16} />
@@ -228,8 +150,8 @@ const AllPetsPage = () => {
                                 <button
                                     onClick={() => setViewMode("list")}
                                     className={`p-2.5 rounded-full transition-all cursor-pointer ${viewMode === "list"
-                                            ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-md"
-                                            : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400"
+                                        ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-md"
+                                        : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 text-gray-600 dark:text-gray-400"
                                         }`}
                                 >
                                     <LayoutList size={16} />
@@ -278,10 +200,10 @@ const AllPetsPage = () => {
                                 </div>
                             </div>
 
-                            <div className="mb-6">
+                            {/* <div className="mb-6">
                                 <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Size</h4>
                                 <div className="space-y-2">
-                                    {["small", "medium", "large"].map((size) => (
+                                    {["male", "female"].map((size) => (
                                         <label key={size} className="flex items-center gap-2 cursor-pointer">
                                             <input
                                                 type="checkbox"
@@ -295,7 +217,7 @@ const AllPetsPage = () => {
                                         </label>
                                     ))}
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="mb-6">
                                 <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Price Range</h4>
@@ -324,15 +246,15 @@ const AllPetsPage = () => {
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
-                                        <span className="text-sm text-gray-700 dark:text-gray-300">Good with Kids</span>
+                                        <span className="text-sm text-gray-700 dark:text-gray-300">Healthy</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
-                                        <span className="text-sm text-gray-700 dark:text-gray-300">Good with Dogs</span>
+                                        <span className="text-sm text-gray-700 dark:text-gray-300">Available</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
-                                        <span className="text-sm text-gray-700 dark:text-gray-300">Good with Cats</span>
+                                        <span className="text-sm text-gray-700 dark:text-gray-300">Adopted</span>
                                     </label>
                                 </div>
                             </div>
@@ -360,8 +282,8 @@ const AllPetsPage = () => {
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
                                         className={`px-4 py-1.5 text-sm rounded-full transition-all ${activeTab === tab
-                                                ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-sm"
-                                                : "text-gray-700 dark:text-gray-300 hover:bg-teal-200 dark:hover:bg-teal-800/50"
+                                            ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-sm"
+                                            : "text-gray-700 dark:text-gray-300 hover:bg-teal-200 dark:hover:bg-teal-800/50"
                                             }`}
                                     >
                                         {tab}
@@ -391,13 +313,13 @@ const AllPetsPage = () => {
                                                 <Heart size={16} className="text-gray-600 dark:text-gray-400 hover:text-red-500" />
                                             </button>
                                         </div>
-                                        
+
                                         <div className="p-4">
                                             {/* Pet Name */}
                                             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                                                 {pet.name}
                                             </h3>
-                                            
+
                                             {/* Species and Breed */}
                                             <div className="space-y-1.5 mb-3">
                                                 <div className="flex items-center gap-2 text-sm">
@@ -409,7 +331,7 @@ const AllPetsPage = () => {
                                                     <span className="text-gray-700 dark:text-gray-300">{pet.breed}</span>
                                                 </div>
                                             </div>
-                                            
+
                                             {/* Age and Gender - Side by Side */}
                                             <div className="grid grid-cols-2 gap-3 mb-3">
                                                 <div className="flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300">
@@ -421,7 +343,7 @@ const AllPetsPage = () => {
                                                     {pet.gender}
                                                 </div>
                                             </div>
-                                            
+
                                             {/* Location and Vaccinated - Side by Side */}
                                             <div className="grid grid-cols-2 gap-3 mb-4">
                                                 <div className="flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300">
@@ -435,7 +357,7 @@ const AllPetsPage = () => {
                                                     </div>
                                                 )}
                                             </div>
-                                            
+
                                             {/* Adoption Fee */}
                                             <div className="mb-3">
                                                 <span className="text-lg font-bold text-teal-600 dark:text-teal-400">
@@ -443,7 +365,7 @@ const AllPetsPage = () => {
                                                 </span>
                                                 <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">adoption fee</span>
                                             </div>
-                                            
+
                                             {/* Two Buttons */}
                                             <div className="flex gap-2">
                                                 <Link href={`/pets/${pet.id}`} className="flex-1">
@@ -482,12 +404,12 @@ const AllPetsPage = () => {
                                                     alt={pet.name}
                                                     className="w-full sm:w-32 h-32 object-cover rounded-xl"
                                                 />
-                                                
+
                                                 <div className="flex-1">
                                                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                                                         {pet.name}
                                                     </h3>
-                                                    
+
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 mb-2">
                                                         <div className="flex items-center gap-2 text-sm">
                                                             <span className="text-gray-500 dark:text-gray-400">Species:</span>
@@ -516,7 +438,7 @@ const AllPetsPage = () => {
                                                             </div>
                                                         )}
                                                     </div>
-                                                    
+
                                                     <div className="flex items-center gap-3 mt-2">
                                                         <span className="text-lg font-bold text-teal-600 dark:text-teal-400">
                                                             ${pet.fee}
@@ -524,7 +446,7 @@ const AllPetsPage = () => {
                                                         <span className="text-xs text-gray-500 dark:text-gray-400">adoption fee</span>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="flex sm:flex-col gap-2">
                                                     <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
                                                         <Heart size={18} className="text-gray-600 dark:text-gray-400" />
