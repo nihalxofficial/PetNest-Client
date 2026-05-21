@@ -15,3 +15,9 @@ export const getPets = async ({ search = "", species = "", fee = "", sort = "pri
     const res = await fetch(`${Api}/pets?${params.toString()}`, { cache: "no-store" });
     return res.json();
 };
+
+export const getFeaturedPets = async ()=>{
+    const res = await fetch(`${Api}/featured`)
+    const pets = await res.json();
+    return pets;
+}

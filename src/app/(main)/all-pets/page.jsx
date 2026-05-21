@@ -26,8 +26,7 @@ import {
     Eye,
     ShoppingBag,
 } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
+
 import { getPets } from "@/lib/pets/data";
 import SearchBar from "@/components/SearchBar";
 import { useSearchParams } from "next/navigation";
