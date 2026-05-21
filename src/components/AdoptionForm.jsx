@@ -14,7 +14,6 @@ import { Calendar, DateField, DatePicker, Description, Label } from "@heroui/rea
 import {
     PawPrint,
     MapPin,
-    // Calendar,
     Syringe,
     Heart,
     User,
@@ -29,20 +28,22 @@ import { getLocalTimeZone, today } from "@internationalized/date";
 
 
 const AdoptionForm = ({ id, petData, user }) => {
-    // const [selectedDate, setSelectedDate] = useState(null);
-    const [message, setMessage] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const [value, setValue] = useState();
-    const handleAdopt = async () => {
-        setIsSubmitting(true);
-        setTimeout(() => {
-            setIsSubmitting(false);
-        }, 1500);
-    };
-
     const [date, setDate] = useState(today(getLocalTimeZone()));
-    console.log(date);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const requestData = Object.fromEntries(formData.entries());
+        
+        const nativeDate = date ? date.toDate(getLocalTimeZone()) : null;
+
+        const modifiedData = {
+            ...requestData,
+            pickUpDate: nativeDate
+        };
+        
+        console.log(modifiedData);
+    };
 
     return (
         <Card className="sticky top-24 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50">
@@ -54,7 +55,7 @@ const AdoptionForm = ({ id, petData, user }) => {
 
                 <div className="border-t border-gray-200 dark:border-gray-700 mb-4" />
 
-                <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Pet Name - Read Only */}
                     <div>
                         <TextField isReadOnly defaultValue={petData?.name} type="text" name="petName">
@@ -89,11 +90,9 @@ const AdoptionForm = ({ id, petData, user }) => {
                     </div>
 
                     {/* Pickup Date - Date Picker */}
-                    <div>
-                        {/* Added className gap-2 to the root picker so children stack cleanly */}
-                        <DatePicker className="w-full gap-2" name="date" value={value} onChange={setValue}>
-
-                            {/* FIX: Explicitly use Hero UI's <Label> and force full layout layout */}
+                    <div className="flex flex-col gap-2">
+                        {/* FIX: Removed name="date" from here, as custom UI tree inputs don't pass to FormData */}
+                        <DatePicker className="w-full gap-2" value={date} onChange={setDate}>
                             <Label className="flex w-full items-center gap-1.5 text-start text-sm font-semibold text-gray-700 dark:text-gray-300">
                                 <CalendarIcon size={14} className="text-teal-500 shrink-0" />
                                 <span>Pickup Date</span>
@@ -134,11 +133,14 @@ const AdoptionForm = ({ id, petData, user }) => {
                                 </Calendar>
                             </DatePicker.Popover>
                         </DatePicker>
+
+                        {/* FIX: Hidden input to cleanly catch the text string inside FormData */}
+                        <input type="hidden" name="date" value={date ? date.toString() : ""} />
                     </div>
 
                     {/* Message - Textarea */}
                     <div>
-                        <TextField  name="message">
+                        <TextField name="message">
                             <Label className="flex items-center gap-1">
                                 <MessageCircle size={14} className="text-teal-500" />
                                 Opinion
@@ -165,8 +167,6 @@ const AdoptionForm = ({ id, petData, user }) => {
                         size="lg"
                         className="w-full bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                         startContent={<Heart size={16} />}
-                        isLoading={isSubmitting}
-                        onClick={handleAdopt}
                     >
                         Submit Adoption Request
                     </Button>
