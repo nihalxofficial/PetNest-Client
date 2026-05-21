@@ -22,6 +22,7 @@ import {
     MessageCircle,
     CheckCircle,
     Info,
+    Clock,
 } from "lucide-react";
 import AdoptionForm from "@/components/AdoptionForm";
 import OwnerRightContainer from "@/components/OwnerRightContainer";
@@ -97,13 +98,42 @@ const PetDetailsPage = async ({ params }) => {
                                         </p>
                                     </div>
                                     <div className="flex gap-2">
-                                        <Chip
-                                            variant="flat"
-                                            color="success"
-                                            startContent={<CheckCircle size={14} />}
-                                        >
-                                            Available
-                                        </Chip>
+                                        {petData.status === "available" && (
+                                            <Chip
+                                                variant="flat"
+                                                color="success"
+                                                className="bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-400"
+                                            >
+                                                <div className="flex items-center gap-1.5">
+                                                    <CheckCircle size={14} />
+                                                    Available
+                                                </div>
+                                            </Chip>
+                                        )}
+                                        {petData.status === "pending" && (
+                                            <Chip
+                                                variant="flat"
+                                                color="warning"
+                                                className="bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
+                                            >
+                                                <div className="flex items-center gap-1.5">
+                                                    <Clock size={14} />
+                                                    Pending
+                                                </div>
+                                            </Chip>
+                                        )}
+                                        {petData.status === "adopted" && (
+                                            <Chip
+                                                variant="flat"
+                                                color="secondary"
+                                                className="bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400"
+                                            >
+                                                <div className="flex items-center gap-1.5">
+                                                    <Heart size={14} className="fill-rose-500" />
+                                                    Adopted
+                                                </div>
+                                            </Chip>
+                                        )}
                                     </div>
                                 </div>
 
@@ -199,26 +229,26 @@ const PetDetailsPage = async ({ params }) => {
                                             <Avatar.Image alt={owner.name} src={owner.image} />
                                             <Avatar.Fallback>{owner.name.charAt(0)}</Avatar.Fallback>
                                         </Avatar>
-                                            <div>
-                                                <p className="font-semibold text-gray-800 dark:text-white">
-                                                    {owner.name}
-                                                </p>
-                                                <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                                    <Mail size={14} />
-                                                    {owner.email}
-                                                </div>
-                                                {/* <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                        <div>
+                                            <p className="font-semibold text-gray-800 dark:text-white">
+                                                {owner.name}
+                                            </p>
+                                            <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                <Mail size={14} />
+                                                {owner.email}
+                                            </div>
+                                            {/* <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
                                                 <Phone size={14} />
                                                 {petData.owner.phone}
                                             </div> */}
-                                                <p className="text-xs text-gray-400 mt-2">
-                                                    Member since {new Date(owner.createdAt).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    })}
-                                                </p>
-                                            </div>
+                                            <p className="text-xs text-gray-400 mt-2">
+                                                Member since {new Date(owner.createdAt).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -227,7 +257,7 @@ const PetDetailsPage = async ({ params }) => {
 
                     {/* Right Column - Adoption Form */}
                     <div className="lg:w-96">
-                        <OwnerRightContainer petData={petData}/>
+                        <OwnerRightContainer petData={petData} />
                         {/* <AdoptionForm petId={petId} petData={petData} />                                             */}
                     </div>
                 </div>
