@@ -2,6 +2,7 @@
 import { Josefin_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { ToastContainer } from "react-toastify";
 
 // Initialize the font
 const josefin = Josefin_Sans({ 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       <body className={josefin.className}>
         <Providers>
           {children}
+          <ToastContainer/>
         </Providers>
       </body>
     </html>

@@ -25,6 +25,8 @@ import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
 import bgImage from "@/assets/signup.jpg";
 import signupImage from "@/assets/welcome.png";
+import Link from "next/link";
+
 
 const LoginPage = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -233,12 +235,12 @@ const LoginPage = () => {
                         <div className="text-center mt-6">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Don&apos;t have an account?{" "}
-                                <HeroUILink
+                                <Link
                                     href="/signup"
                                     className="text-teal-600 dark:text-teal-400 font-semibold hover:underline"
                                 >
                                     Sign up
-                                </HeroUILink>
+                                </Link>
                             </p>
                         </div>
 

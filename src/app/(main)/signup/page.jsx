@@ -1,11 +1,12 @@
 "use client";
-import { Eye, EyeSlash } from "@gravity-ui/icons";
-import { Button, FieldError, InputGroup, Label, TextField } from "@heroui/react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import React, { useState } from "react";
 import {
     Input,
-    Link as HeroUILink,
+    Button,
+    InputGroup,
+    Label
 } from "@heroui/react";
 import {
     EyeOff,
@@ -18,15 +19,122 @@ import {
     Shield,
     Image as ImageIcon,
     Award,
-    CheckCircle
+    CheckCircle,
+    XCircle
 } from "lucide-react";
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
 import bgImage from "@/assets/signup.jpg"
 import signupImage from "@/assets/welcome.png"
+import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const SignUpPage = () => {
+    const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
+    const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [errors, setErrors] = useState({});
+
+    // Password validation checks
+    const passwordChecks = {
+        minLength: password.length >= 6,
+        hasUppercase: /[A-Z]/.test(password),
+        hasLowercase: /[a-z]/.test(password),
+    };
+
+    const allPasswordChecksMet = passwordChecks.minLength && passwordChecks.hasUppercase && passwordChecks.hasLowercase;
+
+    const validatePassword = (pwd) => {
+        if (pwd.length < 6) {
+            return "Password must be at least 6 characters";
+        }
+        if (!/[A-Z]/.test(pwd)) {
+            return "Password must contain at least one uppercase letter";
+        }
+        if (!/[a-z]/.test(pwd)) {
+            return "Password must contain at least one lowercase letter";
+        }
+        return null;
+    };
+
+    // Get confirm password status
+    const getConfirmPasswordStatus = () => {
+        if (confirmPassword.length === 0) return null;
+        if (password !== confirmPassword) return { type: "error", message: "Passwords do not match" };
+        if (password === confirmPassword && allPasswordChecksMet && confirmPassword.length > 0) return { type: "success", message: "Password matched ✓" };
+        return null;
+    };
+
+    const confirmPasswordStatus = getConfirmPasswordStatus();
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const userData = Object.fromEntries(formData.entries());
+        const { name, email, image, location, password, confirmPassword } = userData;
+
+        // Validate name
+        if (name.length < 3) {
+            setErrors({ name: "Name must be at least 3 characters" });
+            return;
+        }
+
+        // Validate email
+        if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
+            setErrors({ email: "Please enter a valid email address" });
+            return;
+        }
+
+        // Validate password
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            setErrors({ password: passwordError });
+            return;
+        }
+
+        // Validate confirm password
+        if (password !== confirmPassword) {
+            setErrors({ confirmPassword: "Passwords do not match" });
+            return;
+        }
+
+        // Clear errors
+        setErrors({});
+
+        const { data, error } = await authClient.signUp.email({
+            name,
+            email,
+            password,
+            image,
+        });
+        if(data){
+            toast.success("SignUp Successful! 🎉")
+            router.push("/")
+        }
+        if(error){
+            toast.error(error.message)
+        }
+    }
+
+    // Real-time error clearing when user types
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+        if (errors.password) {
+            setErrors({ ...errors, password: null });
+        }
+    };
+
+    const handleConfirmPasswordChange = (e) => {
+        setConfirmPassword(e.target.value);
+        if (errors.confirmPassword) {
+            setErrors({ ...errors, confirmPassword: null });
+        }
+    };
+
     return (
         <div className="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             {/* Background Image with Overlays */}
@@ -135,74 +243,68 @@ const SignUpPage = () => {
                             </p>
                         </div>
 
-                        <form className="space-y-4">
+                        <form className="space-y-4" onSubmit={onSubmit}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <TextField
-                                    isRequired
-                                    name="name"
-                                    validate={(value) => {
-                                        if (value.length < 3) {
-                                            return "Name must be at least 3 characters";
-                                        }
-                                        return null;
-                                    }}
-                                >
-                                    <Label className="flex items-center gap-1">
+                                <div>
+                                    <Label className="flex items-center gap-1 mb-1">
                                         <User size={14} className="text-teal-500" />
                                         Name
                                     </Label>
-                                    <Input placeholder="John Doe" startContent={<User size={16} className="text-gray-400" />} />
-                                    <FieldError />
-                                </TextField>
-                                <TextField
-                                    isRequired
-                                    name="email"
-                                    type="email"
-                                    validate={(value) => {
-                                        if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                                            return "Please enter a valid email address";
-                                        }
-                                        return null;
-                                    }}
-                                >
-                                    <Label className="flex items-center gap-1">
+                                    <Input
+                                        name="name"
+                                        placeholder="John Doe"
+                                        startContent={<User size={16} className="text-gray-400" />}
+                                    />
+                                    {errors.name && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <Label className="flex items-center gap-1 mb-1">
                                         <Mail size={14} className="text-teal-500" />
                                         Email
                                     </Label>
-                                    <Input placeholder="john@example.com" startContent={<Mail size={16} className="text-gray-400" />} />
-                                    <FieldError />
-                                </TextField>
+                                    <Input
+                                        name="email"
+                                        type="email"
+                                        placeholder="john@example.com"
+                                        startContent={<Mail size={16} className="text-gray-400" />}
+                                    />
+                                    {errors.email && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <TextField
-                                    isRequired
-                                    name="image"
-                                    type="url"
-                                >
-                                    <Label className="flex items-center gap-1">
+                                <div>
+                                    <Label className="flex items-center gap-1 mb-1">
                                         <ImageIcon size={14} className="text-teal-500" />
                                         Photo Url
                                     </Label>
-                                    <Input placeholder="https://example.com/photo.jpg" startContent={<ImageIcon size={16} className="text-gray-400" />} />
-                                    <FieldError />
-                                </TextField>
-                                <TextField
-                                    isRequired
-                                    name="location"
-                                >
-                                    <Label className="flex items-center gap-1">
+                                    <Input
+                                        name="image"
+                                        type="url"
+                                        placeholder="https://example.com/photo.jpg"
+                                        startContent={<ImageIcon size={16} className="text-gray-400" />}
+                                    />
+                                </div>
+                                <div>
+                                    <Label className="flex items-center gap-1 mb-1">
                                         <MapPin size={14} className="text-teal-500" />
                                         Location
                                     </Label>
-                                    <Input placeholder="City, State" startContent={<MapPin size={16} className="text-gray-400" />} />
-                                    <FieldError />
-                                </TextField>
+                                    <Input
+                                        name="location"
+                                        placeholder="City, State"
+                                        startContent={<MapPin size={16} className="text-gray-400" />}
+                                    />
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <TextField isRequired className="w-full" name="password">
-                                    <Label className="flex items-center gap-1">
+                                <div>
+                                    <Label className="flex items-center gap-1 mb-1">
                                         <Lock size={14} className="text-teal-500" />
                                         Password
                                     </Label>
@@ -211,6 +313,9 @@ const SignUpPage = () => {
                                             className="w-full"
                                             type={isVisible ? "text" : "password"}
                                             placeholder="Create a password"
+                                            name="password"
+                                            value={password}
+                                            onChange={handlePasswordChange}
                                             startContent={<Lock size={16} className="text-gray-400" />}
                                         />
                                         <InputGroup.Suffix className="pr-0">
@@ -221,37 +326,129 @@ const SignUpPage = () => {
                                                 variant="ghost"
                                                 onPress={() => setIsVisible(!isVisible)}
                                             >
-                                                {isVisible ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+                                                {isVisible ? <EyeOff className="size-4" /> : <EyeOff className="size-4" />}
                                             </Button>
                                         </InputGroup.Suffix>
                                     </InputGroup>
-                                </TextField>
 
-                                <TextField isRequired className="w-full" name="confirmPassword">
-                                    <Label className="flex items-center gap-1">
+                                    {/* Password Checklist */}
+                                    <AnimatePresence mode="wait">
+                                        {password.length > 0 && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -10, height: 0 }}
+                                                animate={{ opacity: 1, y: 0, height: "auto" }}
+                                                exit={{ opacity: 0, y: -10, height: 0 }}
+                                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                className="mt-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+                                            >
+                                                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Password requirements:</p>
+                                                <div className="space-y-1.5">
+                                                    <motion.div
+                                                        className="flex items-center gap-2"
+                                                        initial={{ opacity: 0, x: -10 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ delay: 0.1 }}
+                                                    >
+                                                        {passwordChecks.minLength ? (
+                                                            <CheckCircle size={12} className="text-green-500" />
+                                                        ) : (
+                                                            <XCircle size={12} className="text-gray-400" />
+                                                        )}
+                                                        <span className={`text-xs ${passwordChecks.minLength ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                                                            Minimum 6 characters
+                                                        </span>
+                                                    </motion.div>
+                                                    <motion.div
+                                                        className="flex items-center gap-2"
+                                                        initial={{ opacity: 0, x: -10 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ delay: 0.2 }}
+                                                    >
+                                                        {passwordChecks.hasUppercase ? (
+                                                            <CheckCircle size={12} className="text-green-500" />
+                                                        ) : (
+                                                            <XCircle size={12} className="text-gray-400" />
+                                                        )}
+                                                        <span className={`text-xs ${passwordChecks.hasUppercase ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                                                            At least one uppercase letter
+                                                        </span>
+                                                    </motion.div>
+                                                    <motion.div
+                                                        className="flex items-center gap-2"
+                                                        initial={{ opacity: 0, x: -10 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ delay: 0.3 }}
+                                                    >
+                                                        {passwordChecks.hasLowercase ? (
+                                                            <CheckCircle size={12} className="text-green-500" />
+                                                        ) : (
+                                                            <XCircle size={12} className="text-gray-400" />
+                                                        )}
+                                                        <span className={`text-xs ${passwordChecks.hasLowercase ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                                                            At least one lowercase letter
+                                                        </span>
+                                                    </motion.div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
+                                    {errors.password && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <Label className="flex items-center gap-1 mb-1">
                                         <Lock size={14} className="text-teal-500" />
                                         Confirm Password
                                     </Label>
                                     <InputGroup>
                                         <InputGroup.Input
                                             className="w-full"
-                                            type={isVisible ? "text" : "password"}
+                                            type={isConfirmVisible ? "text" : "password"}
                                             placeholder="Confirm your password"
+                                            name="confirmPassword"
+                                            value={confirmPassword}
+                                            onChange={handleConfirmPasswordChange}
                                             startContent={<Lock size={16} className="text-gray-400" />}
                                         />
                                         <InputGroup.Suffix className="pr-0">
                                             <Button
                                                 isIconOnly
-                                                aria-label={isVisible ? "Hide password" : "Show password"}
+                                                aria-label={isConfirmVisible ? "Hide password" : "Show password"}
                                                 size="sm"
                                                 variant="ghost"
-                                                onPress={() => setIsVisible(!isVisible)}
+                                                onPress={() => setIsConfirmVisible(!isConfirmVisible)}
                                             >
-                                                {isVisible ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+                                                {isConfirmVisible ? <EyeOff className="size-4" /> : <EyeOff className="size-4" />}
                                             </Button>
                                         </InputGroup.Suffix>
                                     </InputGroup>
-                                </TextField>
+
+                                    {/* Single Password Match Status Indicator */}
+                                    {confirmPassword.length > 0 && confirmPasswordStatus && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="mt-2"
+                                        >
+                                            {confirmPasswordStatus.type === "error" && (
+                                                <div className="flex items-center gap-2 p-2 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
+                                                    <XCircle size={14} className="text-red-500" />
+                                                    <span className="text-xs text-red-600 dark:text-red-400">{confirmPasswordStatus.message}</span>
+                                                </div>
+                                            )}
+                                            {confirmPasswordStatus.type === "success" && (
+                                                <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+                                                    <CheckCircle size={14} className="text-green-500" />
+                                                    <span className="text-xs text-green-600 dark:text-green-400">{confirmPasswordStatus.message}</span>
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    )}
+                                </div>
                             </div>
 
                             <Button
@@ -288,12 +485,12 @@ const SignUpPage = () => {
                         <div className="text-center mt-6">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Already have an account?{" "}
-                                <HeroUILink
+                                <Link
                                     href="/login"
                                     className="text-teal-600 dark:text-teal-400 font-semibold hover:underline"
                                 >
                                     Log in
-                                </HeroUILink>
+                                </Link>
                             </p>
                         </div>
 

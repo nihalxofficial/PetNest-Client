@@ -29,7 +29,6 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-// Static pet data
 const petsData = [
     {
         id: 1,
