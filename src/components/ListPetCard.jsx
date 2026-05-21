@@ -65,13 +65,13 @@ const ListPetCard = ({pet}) => {
                         <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
                             <Heart size={18} className="text-gray-600 dark:text-gray-400" />
                         </button>
-                        <Link href={`/pets/${pet.id}`}>
+                        <Link href={`/all-pets/${pet._id}`}>
                             <button className="px-4 cursor-pointer py-2 rounded-full border border-teal-500 text-teal-700 dark:border-teal-400 dark:text-teal-400 text-sm font-medium hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all duration-300 flex items-center gap-2">
                                 <Eye size={14} />
                                 View Details
                             </button>
                         </Link>
-                        <Link href={`/adopt/${pet.id}`}>
+                        <Link href={`/adopt/${pet._id}`}>
                             <button className="px-4 py-2 cursor-pointer rounded-full bg-linear-to-r from-teal-600 to-emerald-500 text-white text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2">
                                 <ShoppingBag size={14} />
                                 Adopt Now

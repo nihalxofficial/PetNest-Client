@@ -21,3 +21,9 @@ export const getFeaturedPets = async ()=>{
     const pets = await res.json();
     return pets;
 }
+
+export const getPetById = async (id)=> {
+    const res = await fetch(`${Api}/pets/${id}`);
+    const pet = await res.json();
+    return pet;
+}
