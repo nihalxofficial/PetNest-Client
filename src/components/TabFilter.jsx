@@ -17,7 +17,7 @@ const TabFilter = () => {
     }
     return (
         <div className="flex gap-1 bg-teal-100 dark:bg-teal-900/50 rounded-full p-1">
-            {["All", "Dogs", "Cats", "Rabbits"].map((tab) => (
+            {["All", "Dogs", "Cats", "Birds", "Rabbits"].map((tab) => (
                 <button
                     key={tab}
                     onClick={() => {
