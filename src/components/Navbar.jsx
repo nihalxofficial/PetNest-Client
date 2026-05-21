@@ -59,7 +59,7 @@ const PetNestNavbar = () => {
         { name: "Home", href: "/", icon: Home },
         { name: "All Pets", href: "/all-pets", icon: PawPrint },
         { name: "Add Pet", href: "/add-pet", icon: Plus },
-        { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+        { name: "My Requests", href: "/my-requests", icon: Heart },
     ];
 
     const toggleTheme = () => {
@@ -224,7 +224,7 @@ const PetNestNavbar = () => {
                                                     <LayoutDashboard size={16} className="text-teal-500" />
                                                     Dashboard
                                                 </Link>
-                                                <Link
+                                                {/* <Link
                                                     href="/my-pets"
                                                     onClick={() => setIsDropdownOpen(false)}
                                                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -239,7 +239,7 @@ const PetNestNavbar = () => {
                                                 >
                                                     <List size={16} className="text-teal-500" />
                                                     My Listings
-                                                </Link>
+                                                </Link> */}
                                                 <Link
                                                     href="/settings"
                                                     onClick={() => setIsDropdownOpen(false)}
