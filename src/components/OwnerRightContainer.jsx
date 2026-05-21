@@ -1,25 +1,30 @@
 "use client"
+import { updatePetData } from '@/lib/pets/action';
 import { Button, Card, AlertDialog, Surface, TextField, Select, SelectItem, Input, Modal, Label, ListBox, TextArea, } from '@heroui/react';
 import { Edit, Trash2, User, Upload, FileText, DollarSign, MapPin, Syringe, Heart, PawPrint, VenetianMask, Calendar } from 'lucide-react';
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const OwnerRightContainer = ({ petData }) => {
-    const [species, setSpecies] = useState(null);
-    const [gender, setGender] = useState(null);
-    const [healthStatus, setHealthStatus] = useState(null);
-    const [vaccination, setVaccination] = useState(null);
-    const onSubmit = (e) => {
+    const [species, setSpecies] = useState(petData.species?.toLowerCase() ?? null);
+    const [gender, setGender] = useState(petData.gender?.toLowerCase() ?? null);
+    const [healthStatus, setHealthStatus] = useState(petData.healthStatus?.toLowerCase() ?? null);
+    const [vaccination, setVaccination] = useState(petData.vaccinated === true ? "vaccinated" : "not-vaccinated");
+    const onSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries());
-        const petData = {
+        const updateData = {
             ...data,
             species,
             gender,
             healthStatus,
-            vaccination,
+            vaccination: Boolean(vaccination),
         };
-        console.log(petData);
+        const result = await updatePetData(petData._id, updateData);
+        if(result.modifiedCount>0){
+            toast.success("Data Updated!")
+        }
     }
     return (
         // Owner View - Edit and Delete buttons only
@@ -70,7 +75,7 @@ const OwnerRightContainer = ({ petData }) => {
                                         <form onSubmit={onSubmit} className="space-y-4">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 {/* Pet Name */}
-                                                <TextField isRequired name="name">
+                                                <TextField defaultValue={petData.name} name="name">
                                                     <Label className="flex items-center gap-1">
                                                         <User size={14} className="text-teal-500" />
                                                         Pet Name <span className="text-red-500">*</span>
@@ -79,7 +84,7 @@ const OwnerRightContainer = ({ petData }) => {
                                                 </TextField>
 
                                                 {/* Age */}
-                                                <TextField isRequired name="age">
+                                                <TextField defaultValue={petData.age} isRequired name="age">
                                                     <Label className="flex items-center gap-1">
                                                         <Calendar size={14} className="text-teal-500" />
                                                         Age <span className="text-red-500">*</span>
@@ -126,7 +131,7 @@ const OwnerRightContainer = ({ petData }) => {
                                                 </Select>
 
                                                 {/* Breed */}
-                                                <TextField name="breed">
+                                                <TextField defaultValue={petData.breed} name="breed">
                                                     <Label className="flex items-center gap-1">
                                                         <PawPrint size={14} className="text-teal-500" />
                                                         Breed
@@ -135,7 +140,7 @@ const OwnerRightContainer = ({ petData }) => {
                                                 </TextField>
 
                                                 {/* Image URL */}
-                                                <TextField type="url" name="image">
+                                                <TextField defaultValue={petData.image} type="url" name="image">
                                                     <Label className="flex items-center gap-1">
                                                         <Upload size={14} className="text-teal-500" />
                                                         Image URL
@@ -155,7 +160,7 @@ const OwnerRightContainer = ({ petData }) => {
                                                     </Select.Trigger>
                                                     <Select.Popover>
                                                         <ListBox>
-                                                            <ListBox.Item id="excellent" textValue="excellent">Excellent</ListBox.Item>
+                                                            <ListBox.Item id="healthy" textValue="healthy">Healthy</ListBox.Item>
                                                             <ListBox.Item id="good" textValue="good">Good</ListBox.Item>
                                                             <ListBox.Item id="fair" textValue="fair">Fair</ListBox.Item>
                                                             <ListBox.Item id="needs-care" textValue="needs-care">Needs Care</ListBox.Item>
@@ -182,7 +187,7 @@ const OwnerRightContainer = ({ petData }) => {
                                                 </Select>
 
                                                 {/* Location */}
-                                                <TextField name="location">
+                                                <TextField defaultValue={petData.location} name="location">
                                                     <Label className="flex items-center gap-1">
                                                         <MapPin size={14} className="text-teal-500" />
                                                         Location <span className="text-red-500">*</span>
@@ -191,7 +196,7 @@ const OwnerRightContainer = ({ petData }) => {
                                                 </TextField>
 
                                                 {/* Adoption Fee */}
-                                                <TextField name="fee" type="number">
+                                                <TextField defaultValue={petData.fee} name="fee" type="number">
                                                     <Label className="flex items-center gap-1">
                                                         <DollarSign size={14} className="text-teal-500" />
                                                         Adoption Fee ($) <span className="text-red-500">*</span>
@@ -201,7 +206,7 @@ const OwnerRightContainer = ({ petData }) => {
 
                                                 {/* Description */}
                                                 <div className="md:col-span-2">
-                                                    <TextField name="description">
+                                                    <TextField defaultValue={petData.description} name="description">
                                                         <Label className="flex items-center gap-1">
                                                             <FileText size={14} className="text-teal-500" />
                                                             Description

@@ -1,4 +1,5 @@
 const Api = process.env.NEXT_PUBLIC_API;
+
 // export const getPets = async(searchValue="")=>{
 //     const res = await fetch(`${Api}/pets/?search=${searchValue}`);
 //     const pets = await res.json();
