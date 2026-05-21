@@ -26,10 +26,33 @@ import { FcGoogle } from "react-icons/fc";
 import bgImage from "@/assets/signup.jpg";
 import signupImage from "@/assets/welcome.png";
 import Link from "next/link";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 
 const LoginPage = () => {
+    const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const userData = Object.fromEntries(formData.entries());
+        const { email, password } = userData;
+
+        const { data, error } = await authClient.signIn.email({
+            email,
+            password
+        });
+        console.log(data, error);
+        if(data){
+            toast.success("SignIn Successful! 🎉");
+            router.push("/")
+        }
+        if(error){
+            toast.error(error.message)
+        }
+    }
 
     return (
         <div className="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -139,28 +162,21 @@ const LoginPage = () => {
                             </p>
                         </div>
 
-                        <form className="space-y-4">
+                        <form className="space-y-4" onSubmit={onSubmit}>
                             <div className="grid grid-cols-1 gap-4">
                                 <TextField
                                     isRequired
                                     name="email"
                                     type="email"
-                                    validate={(value) => {
-                                        if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                                            return "Please enter a valid email address";
-                                        }
-                                        return null;
-                                    }}
                                 >
                                     <Label className="flex items-center gap-1">
                                         <Mail size={14} className="text-teal-500" />
                                         Email Address
                                     </Label>
-                                    <Input 
-                                        placeholder="hello@petnest.com" 
-                                        startContent={<Mail size={16} className="text-gray-400" />} 
+                                    <Input
+                                        placeholder="hello@petnest.com"
+                                        startContent={<Mail size={16} className="text-gray-400" />}
                                     />
-                                    <FieldError />
                                 </TextField>
                             </div>
 
@@ -193,12 +209,12 @@ const LoginPage = () => {
                             </div>
 
                             <div className="text-right">
-                                <HeroUILink
+                                <Link
                                     href="/forgot-password"
                                     className="text-sm text-teal-600 dark:text-teal-400 hover:underline"
                                 >
                                     Forgot password?
-                                </HeroUILink>
+                                </Link>
                             </div>
 
                             <Button

@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
       <body className={josefin.className}>
         <Providers>
           {children}
-          <ToastContainer/>
+          <ToastContainer autoClose={2000}/>
         </Providers>
       </body>
     </html>

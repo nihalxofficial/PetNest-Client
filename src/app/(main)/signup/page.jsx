@@ -110,12 +110,14 @@ const SignUpPage = () => {
             email,
             password,
             image,
+            location,
         });
         if(data){
             toast.success("SignUp Successful! 🎉")
             router.push("/")
         }
         if(error){
+            console.log(error);
             toast.error(error.message)
         }
     }
