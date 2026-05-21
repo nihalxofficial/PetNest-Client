@@ -250,7 +250,7 @@ const AllPetsPage = () => {
                         {viewMode === "grid" && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {petsData.map((pet) => (
-                                    <GridPetCard key={pet.id} pet={pet} />
+                                    <GridPetCard key={pet._id} pet={pet} />
                                 ))}
                             </div>
                         )}
@@ -259,7 +259,7 @@ const AllPetsPage = () => {
                         {viewMode === "list" && (
                             <div className="space-y-4">
                                 {petsData.map((pet) => (
-                                    <ListPetCard key={pet.id} pet={pet} />
+                                    <ListPetCard key={pet._id} pet={pet} />
                                 ))}
                             </div>
                         )}

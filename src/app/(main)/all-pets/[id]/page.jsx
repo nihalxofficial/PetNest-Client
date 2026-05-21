@@ -25,46 +25,27 @@ import {
 } from "lucide-react";
 import AdoptionForm from "@/components/AdoptionForm";
 import OwnerRightContainer from "@/components/OwnerRightContainer";
-
-// Static pet data (will be replaced with API call later)
-const petData = {
-    id: 1,
-    name: "Luna",
-    species: "Dog",
-    breed: "Golden Retriever",
-    age: "2 years",
-    ageMonths: 24,
-    gender: "Female",
-    location: "Austin, TX",
-    vaccinated: true,
-    fee: 85,
-    image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&h=500&fit=crop",
-    description: "Luna is a friendly, playful, and loving Golden Retriever who adores children and other pets. She is well-trained, housebroken, and up-to-date on all vaccinations. Luna loves playing fetch, going for long walks, and cuddling on the couch. She would make a wonderful addition to any active family looking for a loyal companion.",
-    healthStatus: "Excellent",
-    temperament: "Friendly, Playful, Loyal",
-    goodWithKids: true,
-    goodWithDogs: true,
-    goodWithCats: true,
-    houseTrained: true,
-    owner: {
-        name: "Sarah Johnson",
-        email: "sarah.johnson@example.com",
-        phone: "+1 (555) 123-4567",
-        avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-        memberSince: "2022",
-    },
-};
-
-// Mock logged-in user data (will be replaced with actual auth data)
+import { getPetById, getUserById } from "@/lib/pets/data";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 
 const PetDetailsPage = async ({ params }) => {
-    const petId = params.id;
+    const { id } = await params
 
+    const petData = await getPetById(id);
 
+    const session = await auth.api.getSession({
+        headers: await headers()
+    })
+
+    const user = session?.user;
+
+    const ownerID = petData?.ownerID;
+    const owner = await getUserById(ownerID);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30 py-8 px-4 sm:px-6 lg:px-8">
             <div className="container mx-auto max-w-7xl">
                 {/* Back Button */}
                 <Button
@@ -73,7 +54,7 @@ const PetDetailsPage = async ({ params }) => {
 
                 >
                     <Link href={"/all-pets"} className="flex justify-between items-center gap-2">
-                    <PawPrint size={16} />
+                        <PawPrint size={16} />
                         Back to All Pets
                     </Link>
                 </Button>
@@ -83,7 +64,7 @@ const PetDetailsPage = async ({ params }) => {
                     <div className="flex-1 space-y-6">
                         {/* Pet Image Card */}
                         <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 overflow-hidden">
-                            <div className="relative h-96 md:h-[500px]">
+                            <div className="relative h-96 md:h-125">
                                 <Image
                                     src={petData.image}
                                     alt={petData.name}
@@ -95,7 +76,7 @@ const PetDetailsPage = async ({ params }) => {
                                     <Chip
                                         color="primary"
                                         variant="shadow"
-                                        className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white"
+                                        className="bg-linear-to-r from-teal-500 to-emerald-500 text-white"
                                     >
                                         Adoption Fee: ${petData.fee}
                                     </Chip>
@@ -214,28 +195,30 @@ const PetDetailsPage = async ({ params }) => {
                                         Owner Information
                                     </h3>
                                     <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                                        <Avatar
-                                            src={petData.owner.avatar}
-                                            name={petData.owner.name.charAt(0)}
-                                            size="lg"
-                                            className="ring-2 ring-teal-500/20"
-                                        />
-                                        <div>
-                                            <p className="font-semibold text-gray-800 dark:text-white">
-                                                {petData.owner.name}
-                                            </p>
-                                            <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                                <Mail size={14} />
-                                                {petData.owner.email}
-                                            </div>
-                                            <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                        <Avatar>
+                                            <Avatar.Image alt={owner.name} src={owner.image} />
+                                            <Avatar.Fallback>{owner.name.charAt(0)}</Avatar.Fallback>
+                                        </Avatar>
+                                            <div>
+                                                <p className="font-semibold text-gray-800 dark:text-white">
+                                                    {owner.name}
+                                                </p>
+                                                <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                    <Mail size={14} />
+                                                    {owner.email}
+                                                </div>
+                                                {/* <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
                                                 <Phone size={14} />
                                                 {petData.owner.phone}
+                                            </div> */}
+                                                <p className="text-xs text-gray-400 mt-2">
+                                                    Member since {new Date(owner.createdAt).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    })}
+                                                </p>
                                             </div>
-                                            <p className="text-xs text-gray-400 mt-2">
-                                                Member since {petData.owner.memberSince}
-                                            </p>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -244,7 +227,7 @@ const PetDetailsPage = async ({ params }) => {
 
                     {/* Right Column - Adoption Form */}
                     <div className="lg:w-96">
-                        <OwnerRightContainer />
+                        <OwnerRightContainer petData={petData}/>
                         {/* <AdoptionForm petId={petId} petData={petData} />                                             */}
                     </div>
                 </div>

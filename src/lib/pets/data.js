@@ -27,3 +27,10 @@ export const getPetById = async (id)=> {
     const pet = await res.json();
     return pet;
 }
+
+export const getUserById = async (id)=> {
+    const res = await fetch(`${Api}/users/${id}`);
+    const user = await res.json();
+    return user;
+}
+
