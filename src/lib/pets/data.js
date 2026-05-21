@@ -5,12 +5,12 @@ const Api = process.env.NEXT_PUBLIC_API;
 //     return pets;
 // }
 
-
-export const getPets = async ({ search = "", species = "", fee = "" } = {}) => {
+export const getPets = async ({ search = "", species = "", fee = "", sort = "price_low" } = {}) => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (species) params.set("species", species);
     if (fee) params.set("fee", fee);
+    params.set("sort", sort);
 
     const res = await fetch(`${Api}/pets?${params.toString()}`, { cache: "no-store" });
     return res.json();

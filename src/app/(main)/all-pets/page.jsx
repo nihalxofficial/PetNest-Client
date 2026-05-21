@@ -32,6 +32,7 @@ import { getPets } from "@/lib/pets/data";
 import SearchBar from "@/components/SearchBar";
 import { useSearchParams } from "next/navigation";
 import TabFilter from "@/components/TabFilter";
+import Sorting from "@/components/Sorting";
 
 const AllPetsPage = () => {
 
@@ -39,22 +40,14 @@ const AllPetsPage = () => {
     const [selectedSpecies, setSelectedSpecies] = useState([]);
     const [selectedSize, setSelectedSize] = useState([]);
     const [priceRange, setPriceRange] = useState([0, 200]);
-    const [sortBy, setSortBy] = useState("price_low");
+    
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [isSortOpen, setIsSortOpen] = useState(false);
+    
 
 
-    const sortOptions = [
-        { id: "price_low", label: "Price: Low to High" },
-        { id: "price_high", label: "Price: High to Low" },
-        { id: "name_asc", label: "Name: A to Z" },
-        { id: "name_desc", label: "Name: Z to A" },
-    ];
+    
 
-    const getSortLabel = () => {
-        const option = sortOptions.find(opt => opt.id === sortBy);
-        return option ? option.label : "Sort by";
-    };
+    
 
     const toggleSpecies = (species) => {
         setSelectedSpecies((prev) =>
@@ -75,6 +68,7 @@ const AllPetsPage = () => {
             const data = await getPets({
                 search: searchParams.get("search") || "",
                 species: searchParams.get("species") || "",
+                sort: searchParams.get("sort") || "price_low",
                 // fee: searchParams.get("fee") || "",
             });
             setPetsData(data)
@@ -114,32 +108,7 @@ const AllPetsPage = () => {
                                 </button>
                             </div>
 
-                            <div className="relative">
-                                <button
-                                    onClick={() => setIsSortOpen(!isSortOpen)}
-                                    className="flex cursor-pointer items-center justify-between gap-2 px-4 py-2.5 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 text-sm min-w-40"
-                                >
-                                    <span>{getSortLabel()}</span>
-                                    <ChevronDown size={14} className={`transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
-                                </button>
-                                {isSortOpen && (
-                                    <div className="absolute top-full right-0 mt-2 w-48 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-xl border border-white/50 dark:border-gray-700/50 z-20 shadow-lg overflow-hidden">
-                                        {sortOptions.map((option) => (
-                                            <button
-                                                key={option.id}
-                                                onClick={() => {
-                                                    setSortBy(option.id);
-                                                    setIsSortOpen(false);
-                                                }}
-                                                className={`w-full cursor-pointer text-left px-4 py-2.5 text-sm hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors ${sortBy === option.id ? 'text-teal-600 dark:text-teal-400 font-medium bg-teal-50/50 dark:bg-teal-900/20' : 'text-gray-700 dark:text-gray-300'
-                                                    }`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                            <Sorting/>
 
                             <div className="flex gap-2">
                                 <button
