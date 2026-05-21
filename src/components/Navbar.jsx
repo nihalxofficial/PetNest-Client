@@ -26,8 +26,10 @@ import {
 
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const PetNestNavbar = () => {
+    const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -38,6 +40,7 @@ const PetNestNavbar = () => {
     const user = session?.user;
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 
@@ -67,6 +70,7 @@ const PetNestNavbar = () => {
         await authClient.signOut();
         setIsDropdownOpen(false);
         setIsMenuOpen(false);
+        router.push("/");
     };
 
     // Handle profile click - close mobile menu and open dropdown
@@ -92,10 +96,10 @@ const PetNestNavbar = () => {
                             whileTap={{ scale: 0.97 }}
                             className="flex items-center gap-3 cursor-pointer"
                         >
-                            <div className="bg-gradient-to-br from-teal-500 to-emerald-500 p-3 rounded-2xl shadow-lg">
+                            <div className="bg-linear-to-br from-teal-500 to-emerald-500 p-3 rounded-2xl shadow-lg">
                                 <PawPrint className="w-5 h-5 text-white" />
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent">
+                            <h1 className="text-2xl sm:text-3xl font-black bg-linear-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent">
                                 PetNest
                             </h1>
                         </motion.div>
@@ -113,7 +117,7 @@ const PetNestNavbar = () => {
                                 >
                                     <Icon size={16} className="text-teal-500" />
                                     {item.name}
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-300 group-hover:w-full"></span>
+                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-teal-500 to-emerald-500 transition-all duration-300 group-hover:w-full"></span>
                                 </Link>
                             );
                         })}
@@ -203,7 +207,7 @@ const PetNestNavbar = () => {
                                                         <p className="font-bold text-gray-800 dark:text-white">
                                                             {user?.name || "User"}
                                                         </p>
-                                                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[180px]">
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-45">
                                                             {user?.email}
                                                         </p>
                                                     </div>
@@ -266,7 +270,7 @@ const PetNestNavbar = () => {
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="hidden sm:flex items-center gap-2 border border-teal-500 text-teal-700 dark:border-teal-400 dark:text-teal-400 font-semibold rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-sm hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all"
+                                        className="hidden cursor-pointer sm:flex items-center gap-2 border border-teal-500 text-teal-700 dark:border-teal-400 dark:text-teal-400 font-semibold rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-sm hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all"
                                     >
                                         <LogIn size={16} />
                                         Login
@@ -277,7 +281,7 @@ const PetNestNavbar = () => {
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-semibold rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-sm shadow-lg hover:shadow-xl transition-all"
+                                        className="hidden cursor-pointer sm:flex items-center gap-2 bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-sm shadow-lg hover:shadow-xl transition-all"
                                     >
                                         <UserPlus size={16} />
                                         Sign Up
@@ -339,7 +343,7 @@ const PetNestNavbar = () => {
                                             <Link
                                                 href="/signup"
                                                 onClick={() => setIsMenuOpen(false)}
-                                                className="flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-semibold rounded-full py-2.5 shadow-md transition-all w-full"
+                                                className="flex items-center justify-center gap-2 bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold rounded-full py-2.5 shadow-md transition-all w-full"
                                             >
                                                 <UserPlus size={16} />
                                                 Sign Up
