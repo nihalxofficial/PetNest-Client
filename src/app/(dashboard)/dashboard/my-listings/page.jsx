@@ -344,7 +344,7 @@ const MyListingsPage = () => {
                         No Listings Yet
                     </h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-4">
-                        You haven't added any pets for adoption yet.
+                        You haven&apos;t added any pets for adoption yet.
                     </p>
                     <Link href="/dashboard/add-pet">
                         <Button className="bg-gradient-to-r from-teal-600 to-emerald-500 text-white">
@@ -527,7 +527,7 @@ const MyListingsPage = () => {
                                         <Button slot="close" variant="secondary" className="flex-1" onPress={() => setIsEditModalOpen(false)}>
                                             Cancel
                                         </Button>
-                                        <Button type="submit" slot="close" className="flex-1 bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300">
+                                        <Button type="submit" slot="close" className="flex-1 bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300">
                                             Save Changes
                                         </Button>
                                     </div>
