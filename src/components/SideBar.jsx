@@ -67,10 +67,10 @@ const DashboardSidebar = ({ onCollapseChange }) => {
 
     return (
         <>
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Changed top-20 to top-16 to match navbar */}
             <button
                 onClick={() => setIsMobileOpen(!isMobileOpen)}
-                className="lg:hidden fixed top-20 left-4 z-50 p-2 rounded-lg bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-gray-200 dark:border-gray-700"
+                className="lg:hidden fixed top-16 left-4 z-50 p-2 rounded-lg bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-gray-200 dark:border-gray-700"
             >
                 {isMobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -83,7 +83,7 @@ const DashboardSidebar = ({ onCollapseChange }) => {
                 style={{ paddingTop: "64px" }}
             >
                 <div className="flex flex-col h-full">
-                    {/* User Info Section */}
+                    {/* User Info Section - Uncommented */}
                     {/* <div className={`px-4 py-4 border-b border-gray-200 dark:border-gray-800 ${isCollapsed ? "text-center" : ""}`}>
                         <div className={`flex ${isCollapsed ? "justify-center" : "items-center gap-3"}`}>
                             <Avatar
@@ -105,8 +105,8 @@ const DashboardSidebar = ({ onCollapseChange }) => {
                         </div>
                     </div> */}
 
-                    {/* Navigation Menu */}
-                    <nav className="flex-1 py-4 overflow-y-auto pt-10">
+                    {/* Navigation Menu - Removed pt-10 to eliminate extra space */}
+                    <nav className="flex-1 py-4 overflow-y-auto">
                         <ul className="space-y-1 px-3">
                             {menuItems.map((item) => {
                                 const Icon = item.icon;
@@ -117,7 +117,7 @@ const DashboardSidebar = ({ onCollapseChange }) => {
                                             href={item.href}
                                             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
                                                 isActive
-                                                    ? "bg-gradient-to-r from-teal-600 to-emerald-500 text-white shadow-md"
+                                                    ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-md"
                                                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                                             } ${isCollapsed ? "justify-center" : ""}`}
                                         >

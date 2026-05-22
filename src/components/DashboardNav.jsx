@@ -1,14 +1,15 @@
-"use client"
+"use client";
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { LayoutDashboard, LogIn, LogOut, Menu, Moon, PawPrint, Settings, Sun, UserPlus, X } from 'lucide-react';
+import { LayoutDashboard, LogOut, Menu, Moon, PawPrint, Settings, Sun, X } from 'lucide-react';
 import Image from 'next/image';
 import { authClient } from '@/lib/auth-client';
-
+import { useRouter } from 'next/navigation';
 
 const DashboardNav = () => {
+    const router = useRouter();
     const { theme, setTheme } = useTheme();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -21,14 +22,12 @@ const DashboardNav = () => {
     const { data: session, isPending } = authClient.useSession();
     const user = session?.user;
 
-
     const handleProfileClick = () => {
         if (window.innerWidth < 1024) {
             setIsMenuOpen(false);
         }
         setIsDropdownOpen(!isDropdownOpen);
     };
-
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -40,7 +39,6 @@ const DashboardNav = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-
     const handleSignOut = async () => {
         await authClient.signOut();
         setIsDropdownOpen(false);
@@ -48,22 +46,21 @@ const DashboardNav = () => {
         router.push("/");
     };
 
-
     return (
         <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 transition-all duration-300">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="h-20 flex items-center justify-between">
+                <div className="h-14 md:h-16 flex items-center justify-between">
                     {/* Logo */}
                     <Link href="/">
                         <motion.div
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
-                            className="flex items-center gap-3 cursor-pointer"
+                            className="flex items-center gap-2 md:gap-3 cursor-pointer"
                         >
-                            <div className="bg-linear-to-br from-teal-500 to-emerald-500 p-3 rounded-2xl shadow-lg">
-                                <PawPrint className="w-5 h-5 text-white" />
+                            <div className="bg-linear-to-br from-teal-500 to-emerald-500 p-2 md:p-3 rounded-xl md:rounded-2xl shadow-lg">
+                                <PawPrint className="w-4 h-4 md:w-5 md:h-5 text-white" />
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-black bg-linear-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent">
+                            <h1 className="text-xl sm:text-2xl md:text-3xl font-black bg-linear-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent">
                                 PetNest
                             </h1>
                         </motion.div>
@@ -76,7 +73,7 @@ const DashboardNav = () => {
                             whileTap={{ scale: 0.9 }}
                             whileHover={{ scale: 1.05 }}
                             onClick={toggleTheme}
-                            className="p-2.5 rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-300"
+                            className="p-2 rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-300"
                         >
                             <AnimatePresence mode="wait" initial={false}>
                                 {theme === "dark" ? (
@@ -87,7 +84,7 @@ const DashboardNav = () => {
                                         exit={{ scale: 0, rotate: 180 }}
                                         transition={{ duration: 0.3 }}
                                     >
-                                        <Sun size={18} className="text-amber-400 cursor-pointer drop-shadow-lg" />
+                                        <Sun size={16} className="text-amber-400 cursor-pointer drop-shadow-lg" />
                                     </motion.div>
                                 ) : (
                                     <motion.div
@@ -97,23 +94,24 @@ const DashboardNav = () => {
                                         exit={{ scale: 0, rotate: -180 }}
                                         transition={{ duration: 0.3 }}
                                     >
-                                        <Moon size={18} className="text-indigo-500 cursor-pointer drop-shadow-md" />
+                                        <Moon size={16} className="text-indigo-500 cursor-pointer drop-shadow-md" />
                                     </motion.div>
                                 )}
                             </AnimatePresence>
                         </motion.button>
 
+                        {/* User Dropdown */}
                         <div className="relative" ref={dropdownRef}>
                             <button
                                 onClick={handleProfileClick}
                                 className="flex items-center gap-2 sm:gap-3 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer"
                             >
                                 <Image
-                                    width={40}
-                                    height={40}
+                                    width={36}
+                                    height={36}
                                     src={user?.image || "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?q=80&w=400"}
                                     alt="avatar"
-                                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-teal-500/20"
+                                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover ring-2 ring-teal-500/20"
                                 />
                                 <div className="text-left hidden md:block">
                                     <p className="text-sm font-semibold text-gray-800 dark:text-white truncate max-w-28">
@@ -123,7 +121,7 @@ const DashboardNav = () => {
                                 </div>
                             </button>
 
-                            {/* Dropdown Menu - Only for Desktop (lg screens) */}
+                            {/* Dropdown Menu */}
                             <AnimatePresence>
                                 {isDropdownOpen && (
                                     <motion.div
@@ -131,7 +129,7 @@ const DashboardNav = () => {
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                                         transition={{ duration: 0.2 }}
-                                        className="absolute right-0 top-14 w-72 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
+                                        className="absolute right-0 top-12 w-72 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
                                     >
                                         {/* User Info */}
                                         <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -165,7 +163,7 @@ const DashboardNav = () => {
                                                 Dashboard
                                             </Link>
                                             <Link
-                                                href="/settings"
+                                                href="/dashboard/settings"
                                                 onClick={() => setIsDropdownOpen(false)}
                                                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                             >
@@ -190,8 +188,6 @@ const DashboardNav = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Mobile Menu - Only shows nav links, NOT dropdown items */}
             </div>
         </nav>
     );
