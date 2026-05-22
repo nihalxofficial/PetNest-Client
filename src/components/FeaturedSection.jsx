@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -8,18 +8,24 @@ import {
 } from "lucide-react";
 import FeaturedCard from "./FeaturedCard";
 import { getFeaturedPets } from "@/lib/pets/data";
+import { FeaturedCardSkeleton } from "./FeaturedCardSkeleton ";
+
+
 
 const FeaturedPetsSection = () => {
-  const [featuredPetsData, setFeaturedPetsData] = useState([])
-  useEffect(()=>{
-    const fetchPets = async()=> {
-      const data = await getFeaturedPets();
-      setFeaturedPetsData(data)
-    }
-    fetchPets();
-  },[])
+  const [featuredPetsData, setFeaturedPetsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  
+  useEffect(() => {
+    const fetchPets = async () => {
+      setIsLoading(true);
+      const data = await getFeaturedPets();
+      setFeaturedPetsData(data);
+      setIsLoading(false);
+    };
+    fetchPets();
+  }, []);
+
   const getSpeciesStyles = (species) => {
     switch(species) {
       case 'Dog':
@@ -95,13 +101,24 @@ const FeaturedPetsSection = () => {
 
         {/* Featured Pets Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {featuredPetsData.map((pet,index) => {
-            const styles = getSpeciesStyles(pet.species);
-            
-            return (
-              <FeaturedCard key={pet._id} styles={styles} index={index} pet={pet}/>
-            );
-          })}
+          {isLoading
+            ? // Show skeletons while loading
+              [...Array(6)].map((_, index) => (
+                <FeaturedCardSkeleton key={index} />
+              ))
+            : // Show actual cards when data is loaded
+              featuredPetsData.map((pet, index) => {
+                const styles = getSpeciesStyles(pet.species);
+                return (
+                  <FeaturedCard
+                    key={pet._id}
+                    styles={styles}
+                    index={index}
+                    pet={pet}
+                  />
+                );
+              })
+          }
         </div>
 
         {/* View All Pets Link */}
@@ -118,6 +135,19 @@ const FeaturedPetsSection = () => {
           </Link>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float 6s ease-in-out infinite 2s;
+        }
+      `}</style>
     </section>
   );
 };
