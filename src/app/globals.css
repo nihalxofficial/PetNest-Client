@@ -16,3 +16,53 @@ body {
 .bg-linear-br {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
 }
+
+
+/* app/globals.css - Add at the bottom */
+
+@keyframes loading {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 100%; }
+}
+
+.animate-loading {
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translateY(-8px);
+        opacity: 1;
+    }
+}
+
+.animate-bounce {
+    animation: bounce 0.8s ease-in-out infinite;
+}
+
+@keyframes slide-messages {
+    0%, 15% {
+        transform: translateY(0);
+    }
+    20%, 35% {
+        transform: translateY(-48px);
+    }
+    40%, 55% {
+        transform: translateY(-96px);
+    }
+    60%, 75% {
+        transform: translateY(-144px);
+    }
+    80%, 100% {
+        transform: translateY(-192px);
+    }
+}
+
+.animate-slide-messages {
+    animation: slide-messages 10s ease-in-out infinite;
+}
