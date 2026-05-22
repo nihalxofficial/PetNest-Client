@@ -258,10 +258,30 @@ const PetDetailsPage = async ({ params }) => {
 
                     {/* Right Column - Adoption Form */}
                     <div className="lg:w-96">
-                    {
-                        isOwner ? <OwnerRightContainer petData={petData} />
-                        : <AdoptionForm id={id} petData={petData} user={user} />                                            
-                    }
+                        {
+                            isOwner ? <OwnerRightContainer petData={petData} />
+                                : petData.status === "adopted" ?
+                                    <Card className="sticky top-24 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50">
+                                        <div className="p-6 text-center">
+                                            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-rose-100 dark:bg-rose-950/50 flex items-center justify-center">
+                                                <Heart size={40} className="text-rose-500 fill-rose-500" />
+                                            </div>
+                                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                                This Pet Has Been Adopted
+                                            </h2>
+                                            <p className="text-gray-500 dark:text-gray-400 mb-4">
+                                                {petData.name} has found their forever home. Thank you for your interest in giving pets a loving home.
+                                            </p>
+                                            <Button className="w-full bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold">
+                                                <Link href="/all-pets" className="flex items-center gap-2">
+                                                <PawPrint size={16} />
+                                                    Browse Other Pets
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    </Card> :
+                                    <AdoptionForm id={id} petData={petData} user={user} />
+                        }
                     </div>
                 </div>
             </div>
