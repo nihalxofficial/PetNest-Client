@@ -34,10 +34,14 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { PetDetailsPageSkeleton } from "@/components/PetDetailsPageSkeleton";
 
+// Full Page Skeleton Component
+
+
 const PetDetailsPage = async ({ params }) => {
     const { id } = await params
 
     const petData = await getPetById(id);
+    
 
     const session = await auth.api.getSession({
         headers: await headers()
@@ -48,7 +52,6 @@ const PetDetailsPage = async ({ params }) => {
     const owner = await getUserById(ownerID);
 
     const isOwner = user?.email === petData?.ownerEmail;
-
 
     // Show skeleton while data is loading
     if (!petData || !owner) {
