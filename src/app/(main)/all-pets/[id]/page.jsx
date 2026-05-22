@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -8,11 +7,16 @@ import {
     DatePicker,
     Chip,
     Avatar,
+    TextField,
+    Label,
+    TextArea,
+    DateField,
+    Calendar,
 } from "@heroui/react";
 import {
     PawPrint,
     MapPin,
-    Calendar,
+    Calendar as CalendarIcon,
     Syringe,
     Heart,
     User,
@@ -28,6 +32,9 @@ import OwnerRightContainer from "@/components/OwnerRightContainer";
 import { getPetById, getUserById } from "@/lib/pets/data";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { PetDetailsPageSkeleton } from "@/components/PetDetailsPageSkeleton";
+
+// Full Page Skeleton Component
 
 
 const PetDetailsPage = async ({ params }) => {
@@ -44,6 +51,11 @@ const PetDetailsPage = async ({ params }) => {
     const owner = await getUserById(ownerID);
 
     const isOwner = user?.email === petData?.ownerEmail;
+
+    // Show skeleton while data is loading
+    if (!petData || !owner) {
+        return <PetDetailsPageSkeleton />;
+    }
 
     return (
         <div className="min-h-screen bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30 py-8 px-4 sm:px-6 lg:px-8">
@@ -142,7 +154,7 @@ const PetDetailsPage = async ({ params }) => {
                                 {/* Pet Details Grid */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                     <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                                        <Calendar size={20} className="text-teal-500" />
+                                        <CalendarIcon size={20} className="text-teal-500" />
                                         <div>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">Age</p>
                                             <p className="font-semibold text-gray-800 dark:text-white">{petData.age}</p>
@@ -237,10 +249,6 @@ const PetDetailsPage = async ({ params }) => {
                                                 <Mail size={14} />
                                                 {owner.email}
                                             </div>
-                                            {/* <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                                <Phone size={14} />
-                                                {petData.owner.phone}
-                                            </div> */}
                                             <p className="text-xs text-gray-400 mt-2">
                                                 Member since {new Date(owner.createdAt).toLocaleDateString('en-US', {
                                                     year: 'numeric',
