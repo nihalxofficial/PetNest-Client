@@ -58,8 +58,8 @@ const PetNestNavbar = () => {
     const menuItems = [
         { name: "Home", href: "/", icon: Home },
         { name: "All Pets", href: "/all-pets", icon: PawPrint },
-        { name: "Add Pet", href: "/add-pet", icon: Plus },
-        { name: "My Requests", href: "/my-requests", icon: Heart },
+        { name: "Add Pet", href: "/dashboard/add-pet", icon: Plus },
+        { name: "My Requests", href: "/dashboard/my-requests", icon: Heart },
     ];
 
     const toggleTheme = () => {
