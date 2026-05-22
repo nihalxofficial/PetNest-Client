@@ -1,11 +1,13 @@
 "use client"
-import { updatePetData } from '@/lib/pets/action';
-import { Button, Card, AlertDialog, Surface, TextField, Select, SelectItem, Input, Modal, Label, ListBox, TextArea, } from '@heroui/react';
+import { deletePetData, updatePetData } from '@/lib/pets/action';
+import { Button, Card, AlertDialog, TextField, Select, Input, Modal, Label, ListBox, TextArea, } from '@heroui/react';
 import { Edit, Trash2, User, Upload, FileText, DollarSign, MapPin, Syringe, Heart, PawPrint, VenetianMask, Calendar } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 
 const OwnerRightContainer = ({ petData }) => {
+    const router = useRouter();
     const [species, setSpecies] = useState(petData.species?.toLowerCase() ?? null);
     const [gender, setGender] = useState(petData.gender?.toLowerCase() ?? null);
     const [healthStatus, setHealthStatus] = useState(petData.healthStatus?.toLowerCase() ?? null);
@@ -26,6 +28,15 @@ const OwnerRightContainer = ({ petData }) => {
         if(result.modifiedCount>0){
             toast.success("Data Updated!")
         }
+    }
+
+    const handleDelete = async() => {
+        const result = await deletePetData(petData._id);
+        if(result.deletedCount>0){
+            toast.warning(`${petData.name} is deleted from listings`)
+            router.push("/all-pets")
+        }
+        console.log(result);
     }
     return (
         // Owner View - Edit and Delete buttons only
@@ -277,6 +288,7 @@ const OwnerRightContainer = ({ petData }) => {
                                         </Button>
                                         <Button
                                             slot="close"
+                                            onClick={handleDelete}
                                             className="flex-1 bg-linear-to-r from-red-600 to-red-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                                             startContent={<Trash2 size={16} />}
                                         >

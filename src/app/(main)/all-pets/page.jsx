@@ -263,7 +263,7 @@ const AllPetsPage = () => {
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         <div className="w-24 h-24 rounded-full bg-amber-500/10 animate-ping" />
                                     </div>
-                                    <div className="relative bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/50 dark:to-amber-800/50 p-5 rounded-full">
+                                    <div className="relative bg-linear-to-br from-amber-100 to-amber-200 dark:from-amber-900/50 dark:to-amber-800/50 p-5 rounded-full">
                                         <Frown size={48} className="text-amber-600 dark:text-amber-400" />
                                     </div>
                                 </div>
@@ -275,7 +275,7 @@ const AllPetsPage = () => {
 
                                 {/* Description */}
                                 <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6">
-                                    We couldn't find any pets matching your criteria. Try adjusting your filters or check back later for new arrivals.
+                                    We couldn&apos;t find any pets matching your criteria. Try adjusting your filters or check back later for new arrivals.
                                 </p>
 
                                 {/* Suggestions */}
@@ -308,7 +308,7 @@ const AllPetsPage = () => {
                                             Reset All Filters
                                         </Link>
                                     </button>
-                                    <button className="inline-flex cursor-pointer items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                                    <button className="inline-flex cursor-pointer items-center gap-2 px-5 py-2.5 bg-linear-to-r from-teal-600 to-emerald-500 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300">
                                         <PawPrint size={16} />
                                         <Link href="/">
                                             Back to Home

@@ -32,6 +32,14 @@ export const updatePetData = async (id, data)=> {
     return data;
 }
 
+export const deletePetData = async(id)=>{
+    const res = await fetch(`${Api}/pets/${id}`,{
+        method: "DELETE"
+    })
+    const data = res.json();
+    return data;
+}
+
 export const requestAdoption = async(id, adoptionData)=> {
     const res = await fetch(`${Api}/adoptions/${id}`,{
         method: "POST",
