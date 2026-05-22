@@ -25,11 +25,11 @@ import {
 } from "lucide-react";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { getLocalTimeZone, today } from "@internationalized/date";
+import { requestAdoption } from '@/lib/pets/action';
 
 
 const AdoptionForm = ({ id, petData, user }) => {
     const [date, setDate] = useState(today(getLocalTimeZone()));
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
@@ -38,11 +38,13 @@ const AdoptionForm = ({ id, petData, user }) => {
         const nativeDate = date ? date.toDate(getLocalTimeZone()) : null;
 
         const modifiedData = {
+            petId: id,
             ...requestData,
             pickUpDate: nativeDate
         };
         
-        console.log(modifiedData);
+        const data = await requestAdoption(id, modifiedData)
+        console.log(data);
     };
 
     return (
@@ -80,7 +82,7 @@ const AdoptionForm = ({ id, petData, user }) => {
 
                     {/* User Email - Read Only */}
                     <div>
-                        <TextField isReadOnly defaultValue={user?.email} type="email" name="email">
+                        <TextField isReadOnly defaultValue={user?.email} type="email" name="userEmail">
                             <Label className="flex items-center gap-1">
                                 <Mail size={14} className="text-teal-500" />
                                 Your Email

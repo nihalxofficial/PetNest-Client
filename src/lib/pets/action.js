@@ -19,3 +19,18 @@ export const updatePetData = async (id, data)=> {
     }
     return data;
 }
+
+export const requestAdoption = async(id, adoptionData)=> {
+    const res = await fetch(`${Api}/adoptions/${id}`,{
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(adoptionData)
+    })
+    const data = await res.json();
+    if(data.insertedId){
+        revalidatePath(`${Api}/pets/${id}`)
+    }
+    return data;
+}

@@ -111,7 +111,7 @@ const PetDetailsPage = async ({ params }) => {
                                                 </div>
                                             </Chip>
                                         )}
-                                        {petData.status === "pending" && (
+                                        {petData.status === "adopting" && (
                                             <Chip
                                                 variant="flat"
                                                 color="warning"
@@ -119,7 +119,7 @@ const PetDetailsPage = async ({ params }) => {
                                             >
                                                 <div className="flex items-center gap-1.5">
                                                     <Clock size={14} />
-                                                    Pending
+                                                    Adopting
                                                 </div>
                                             </Chip>
                                         )}
