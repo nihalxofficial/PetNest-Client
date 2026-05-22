@@ -34,6 +34,8 @@ import TabFilter from "@/components/TabFilter";
 import Sorting from "@/components/Sorting";
 import GridPetCard from "@/components/GridPetCard";
 import ListPetCard from "@/components/ListPetCard";
+import { GridPetCardSkeleton } from "@/components/GridPetCardSkeleton";
+import { ListPetCardSkeleton } from "@/components/ListPetCardSkeleton";
 
 const AllPetsPage = () => {
 
@@ -42,6 +44,7 @@ const AllPetsPage = () => {
     const [selectedSize, setSelectedSize] = useState([]);
     const [priceRange, setPriceRange] = useState([0, 200]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const toggleSpecies = (species) => {
         setSelectedSpecies((prev) =>
@@ -57,8 +60,10 @@ const AllPetsPage = () => {
 
     const [petsData, setPetsData] = useState([])
     const searchParams = useSearchParams();
+    
     useEffect(() => {
         const fetchPets = async () => {
+            setIsLoading(true);
             const data = await getPets({
                 search: searchParams.get("search") || "",
                 species: searchParams.get("species") || "",
@@ -66,6 +71,7 @@ const AllPetsPage = () => {
                 // fee: searchParams.get("fee") || "",
             });
             setPetsData(data)
+            setIsLoading(false);
         }
 
         fetchPets()
@@ -229,8 +235,25 @@ const AllPetsPage = () => {
                             <TabFilter />
                         </div>
 
+                        {/* Loading Skeletons */}
+                        {isLoading && viewMode === "grid" && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {[...Array(6)].map((_, index) => (
+                                    <GridPetCardSkeleton key={index} />
+                                ))}
+                            </div>
+                        )}
+
+                        {isLoading && viewMode === "list" && (
+                            <div className="space-y-4">
+                                {[...Array(4)].map((_, index) => (
+                                    <ListPetCardSkeleton key={index} />
+                                ))}
+                            </div>
+                        )}
+
                         {/* Grid View */}
-                        {viewMode === "grid" && (
+                        {!isLoading && viewMode === "grid" && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {petsData.map((pet) => (
                                     <GridPetCard key={pet._id} pet={pet} />
@@ -239,7 +262,7 @@ const AllPetsPage = () => {
                         )}
 
                         {/* List View */}
-                        {viewMode === "list" && (
+                        {!isLoading && viewMode === "list" && (
                             <div className="space-y-4">
                                 {petsData.map((pet) => (
                                     <ListPetCard key={pet._id} pet={pet} />
