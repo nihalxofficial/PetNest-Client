@@ -54,6 +54,7 @@ const AddPetPage = () => {
                 species,
                 gender,
                 healthStatus,
+                status: "available",
                 vaccination: Boolean(vaccination),
             };
 

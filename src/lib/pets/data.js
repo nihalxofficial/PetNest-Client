@@ -35,6 +35,20 @@ export const getUserById = async (id)=> {
     return user;
 }
 
+export const getAdoptionByPet = async (id)=> {
+    const res = await fetch(`${Api}/adoptions/${id}`);
+    const adoption = await res.json();
+    return adoption;
+}
+
+export const getPetByOwner = async (id)=> {
+    const res = await fetch(`${Api}/listings/${id}`);
+    const pets = await res.json();
+    return pets;
+}
+
+
+
 // export const getUserByEmail = async (email) => {
 //   const res = await fetch(`${Api}/users?email=${email}`);
 //   const user = await res.json();

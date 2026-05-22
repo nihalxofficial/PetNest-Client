@@ -26,6 +26,7 @@ import {
 import { Calendar as CalendarIcon } from "lucide-react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { requestAdoption } from '@/lib/pets/action';
+import { toast } from 'react-toastify';
 
 
 const AdoptionForm = ({ id, petData, user }) => {
@@ -40,11 +41,14 @@ const AdoptionForm = ({ id, petData, user }) => {
         const modifiedData = {
             petId: id,
             ...requestData,
+            status: "pending",
             pickUpDate: nativeDate
         };
         
         const data = await requestAdoption(id, modifiedData)
-        console.log(data);
+        if(data.insertedId){
+            toast.success(`Adoption request for ${petData.name} successful!`)
+        }
     };
 
     return (

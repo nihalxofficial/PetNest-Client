@@ -2,15 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    Button,
-    Card,
-    Chip,
-    Pagination,
-    Select,
-    Label,
-    ListBox,
-} from "@heroui/react";
-import {
     Search,
     Filter,
     Grid3x3,

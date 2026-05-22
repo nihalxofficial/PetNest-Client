@@ -1,7 +1,6 @@
-// app/(dashboard)/dashboard/my-listings/page.jsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -36,116 +35,13 @@ import {
     DollarSign,
     FileText,
 } from "lucide-react";
+import { getAdoptionByPet, getPetByOwner } from "@/lib/pets/data";
+import { authClient } from "@/lib/auth-client";
+import { CircleCheckFill } from "@gravity-ui/icons";
+import { approveAdoption, rejectAdoption } from "@/lib/pets/action";
 
-// Hardcoded pet listings data
-const myListingsData = [
-    {
-        id: "pet_1",
-        name: "Luna",
-        species: "Dog",
-        breed: "Golden Retriever",
-        age: "2 years",
-        gender: "Female",
-        location: "Austin, TX",
-        fee: 85,
-        image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&h=300&fit=crop",
-        status: "available",
-        vaccinated: true,
-        healthStatus: "Excellent",
-        description: "Luna is a friendly and playful Golden Retriever who loves children and other pets.",
-        requests: [
-            {
-                id: "req_1",
-                userName: "John Doe",
-                userEmail: "john.doe@example.com",
-                pickupDate: "2024-05-20",
-                status: "pending",
-            },
-            {
-                id: "req_2",
-                userName: "Sarah Johnson",
-                userEmail: "sarah.j@example.com",
-                pickupDate: "2024-05-22",
-                status: "pending",
-            },
-        ],
-    },
-    {
-        id: "pet_2",
-        name: "Oliver",
-        species: "Cat",
-        breed: "Maine Coon",
-        age: "1.5 years",
-        gender: "Male",
-        location: "Denver, CO",
-        fee: 70,
-        image: "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=400&h=300&fit=crop",
-        status: "available",
-        vaccinated: true,
-        healthStatus: "Good",
-        description: "Oliver is a gentle giant who loves cuddles and playing with toys.",
-        requests: [
-            {
-                id: "req_3",
-                userName: "Michael Brown",
-                userEmail: "michael.b@example.com",
-                pickupDate: "2024-05-18",
-                status: "pending",
-            },
-        ],
-    },
-    {
-        id: "pet_3",
-        name: "Rocky",
-        species: "Dog",
-        breed: "German Shepherd",
-        age: "3 years",
-        gender: "Male",
-        location: "Chicago, IL",
-        fee: 95,
-        image: "https://images.unsplash.com/photo-1568572933382-74d440642117?w=400&h=300&fit=crop",
-        status: "adopted",
-        vaccinated: true,
-        healthStatus: "Excellent",
-        description: "Rocky is a loyal and protective German Shepherd, great for active families.",
-        requests: [],
-    },
-    {
-        id: "pet_4",
-        name: "Mochi",
-        species: "Cat",
-        breed: "Ragdoll",
-        age: "6 months",
-        gender: "Female",
-        location: "San Diego, CA",
-        fee: 120,
-        image: "https://images.unsplash.com/photo-1583511655826-05700d52f4d9?w=400&h=300&fit=crop",
-        status: "available",
-        vaccinated: true,
-        healthStatus: "Excellent",
-        description: "Mochi is a sweet and affectionate Ragdoll cat who loves to be held.",
-        requests: [],
-    },
-    {
-        id: "pet_5",
-        name: "Coco",
-        species: "Rabbit",
-        breed: "Holland Lop",
-        age: "1 year",
-        gender: "Female",
-        location: "Portland, OR",
-        fee: 50,
-        image: "https://images.unsplash.com/photo-1535241749838-299277b6305f?w=400&h=300&fit=crop",
-        status: "available",
-        vaccinated: true,
-        healthStatus: "Good",
-        description: "Coco is a fluffy and energetic rabbit who loves to hop around.",
-        requests: [],
-    },
-];
 
 const MyListingsPage = () => {
-    const [listings, setListings] = useState(myListingsData);
     const [selectedPet, setSelectedPet] = useState(null);
     const [isRequestsModalOpen, setIsRequestsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -159,9 +55,39 @@ const MyListingsPage = () => {
     const [vaccination, setVaccination] = useState("");
 
     // Stats calculations
-    const totalListings = listings.length;
-    const availablePets = listings.filter(pet => pet.status === "available").length;
-    const adoptedPets = listings.filter(pet => pet.status === "adopted").length;
+    // const totalListings = listings.length;
+    // const availablePets = listings.filter(pet => pet.status === "available").length;
+    // const adoptedPets = listings.filter(pet => pet.status === "adopted").length;
+
+    const { data: session } = authClient.useSession()
+    const ownerID = session?.user?.id;
+
+    const [adoptions, setAdoptions] = useState([])
+    const [listings, setListings] = useState([])
+    useEffect(() => {
+        if (!ownerID) return;
+
+        const fetchData = async () => {
+            try {
+                const listingsData = await getPetByOwner(ownerID);
+                setListings(listingsData);
+
+                if (selectedPet?._id) {
+                    const adoptionData = await getAdoptionByPet(selectedPet._id);
+                    setAdoptions(adoptionData);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
+    }, [ownerID, selectedPet?._id]);
+
+    // console.log(selectedPet);
+    // console.log("Adoptions", adoptions);
+    // console.log("Listings", listings);
+    
 
     const handleViewRequests = (pet) => {
         setSelectedPet(pet);
@@ -183,37 +109,44 @@ const MyListingsPage = () => {
     };
 
     const handleDeleteConfirm = () => {
-        console.log("Delete pet:", petToDelete?.id);
-        // Remove from listings array
-        setListings(listings.filter(pet => pet.id !== petToDelete?.id));
-        setIsDeleteModalOpen(false);
-        setPetToDelete(null);
+
     };
 
-    const handleApproveRequest = (requestId) => {
-        console.log("Approve request:", requestId);
+    const handleApproveRequest = async(adoptionId) => {
+        const data = await approveAdoption(adoptionId)
+        console.log(data);
+        
     };
 
-    const handleRejectRequest = (requestId) => {
-        console.log("Reject request:", requestId);
+    const handleRejectRequest = async(adoptionId) => {
+        const data = await rejectAdoption(adoptionId)
+        console.log(data); 
     };
 
     const handleEditSubmit = (e) => {
-        e.preventDefault();
-        console.log("Updated pet data:", { selectedPet, species, gender, healthStatus, vaccination });
-        setIsEditModalOpen(false);
+
     };
 
     const StatusChip = ({ status }) => {
         if (status === "available") {
             return (
-                <Chip color="success" variant="flat" startContent={<CheckCircle size={12} />}>
-                    Available
+                <Chip color="success">
+                    <CircleCheckFill width={12} />
+                    <Chip.Label>Available</Chip.Label>
                 </Chip>
             );
         }
+        if (status === "adopting") {
+            return (
+                <Chip color="warning">
+                    <Clock width={12} />
+                    <Chip.Label>adopting</Chip.Label>
+                </Chip>
+            )
+        }
         return (
-            <Chip color="secondary" variant="flat" startContent={<Heart size={12} />}>
+            <Chip color="secondary" variant="flat" className="text-rose-500">
+                <Heart size={12} />
                 Adopted
             </Chip>
         );
@@ -242,7 +175,7 @@ const MyListingsPage = () => {
                     <div className="p-4 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Total Listings</p>
-                            <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalListings}</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center">
                             <PawPrint size={24} className="text-teal-600 dark:text-teal-400" />
@@ -254,7 +187,7 @@ const MyListingsPage = () => {
                     <div className="p-4 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Available Pets</p>
-                            <p className="text-3xl font-bold text-green-600 dark:text-green-400">{availablePets}</p>
+                            <p className="text-3xl font-bold text-green-600 dark:text-green-400">0</p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
                             <CheckCircle size={24} className="text-green-600 dark:text-green-400" />
@@ -266,7 +199,7 @@ const MyListingsPage = () => {
                     <div className="p-4 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Adopted Pets</p>
-                            <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">{adoptedPets}</p>
+                            <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">0</p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
                             <Heart size={24} className="text-rose-600 dark:text-rose-400" />
@@ -330,17 +263,17 @@ const MyListingsPage = () => {
                                 {/* Action Buttons */}
                                 <div className="flex flex-wrap gap-2 mt-3">
                                     {/* Requests Button → opens Requests Modal */}
-                                    {pet.status === "available" && pet.requests.length > 0 && (
-                                        <Button
-                                            size="sm"
-                                            variant="bordered"
-                                            onPress={() => handleViewRequests(pet)}
-                                            startContent={<MessageCircle size={14} />}
-                                            className="border-teal-500 text-teal-600"
-                                        >
-                                            Requests ({pet.requests.length})
-                                        </Button>
-                                    )}
+                                    {/* {pet.status === "available" && pet.requests.length > 0 && ( */}
+                                    <Button
+                                        size="sm"
+                                        variant="bordered"
+                                        onPress={() => handleViewRequests(pet)}
+                                        startContent={<MessageCircle size={14} />}
+                                        className="border-teal-500 text-teal-600"
+                                    >
+                                        Requests
+                                    </Button>
+                                    {/*  )} */}
                                     {/* View Button → navigates to /all-pets/:id */}
                                     <Button
                                         size="sm"
@@ -584,111 +517,130 @@ const MyListingsPage = () => {
             </Modal>
 
             {/* ========== REQUESTS MODAL ========== */}
-            {/* ========== REQUESTS MODAL ========== */}
-{isRequestsModalOpen && selectedPet && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[85vh] flex flex-col">
-            {/* Header - White/Clean */}
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                            Adoption Requests for {selectedPet.name}
-                        </h2>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                            Review and manage adoption requests
-                        </p>
-                    </div>
-                    <button
-                        onClick={() => setIsRequestsModalOpen(false)}
-                        className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    >
-                        <XCircle size={22} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                    </button>
-                </div>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-                {selectedPet.requests.length === 0 ? (
-                    <div className="text-center py-8">
-                        <p className="text-gray-500 dark:text-gray-400">No adoption requests yet.</p>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {selectedPet.requests.map((request) => (
-                            <div key={request.id} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-                                <div className="flex justify-between items-start mb-3">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <User size={14} className="text-teal-500" />
-                                            <span className="font-semibold text-gray-800 dark:text-white">
-                                                {request.userName}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                                            <Mail size={12} />
-                                            {request.userEmail}
-                                        </div>
-                                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                            <Calendar size={12} />
-                                            Pickup: {new Date(request.pickupDate).toLocaleDateString()}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        {request.status === "pending" && (
-                                            <Chip color="warning" variant="flat" size="sm" startContent={<Clock size={12} />}>
-                                                Pending
-                                            </Chip>
-                                        )}
-                                        {request.status === "approved" && (
-                                            <Chip color="success" variant="flat" size="sm" startContent={<CheckCircle size={12} />}>
-                                                Approved
-                                            </Chip>
-                                        )}
-                                        {request.status === "rejected" && (
-                                            <Chip color="danger" variant="flat" size="sm" startContent={<XCircle size={12} />}>
-                                                Rejected
-                                            </Chip>
-                                        )}
-                                    </div>
+            {isRequestsModalOpen && selectedPet && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[85vh] flex flex-col">
+                        {/* Header - White/Clean */}
+                        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                                        Adoption Requests for {selectedPet.name}
+                                    </h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                                        Review and manage adoption requests
+                                    </p>
                                 </div>
-                                {request.status === "pending" && selectedPet.status === "available" && (
-                                    <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                        <Button
-                                            size="sm"
-                                            color="success"
-                                            onPress={() => handleApproveRequest(request.id)}
-                                            startContent={<CheckCircle size={14} />}
-                                        >
-                                            Approve
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            color="danger"
-                                            variant="bordered"
-                                            onPress={() => handleRejectRequest(request.id)}
-                                            startContent={<XCircle size={14} />}
-                                        >
-                                            Reject
-                                        </Button>
-                                    </div>
-                                )}
+                                <button
+                                    onClick={() => setIsRequestsModalOpen(false)}
+                                    className="p-1 cursor-pointer rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                >
+                                    <XCircle size={22} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                                </button>
                             </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+                        </div>
 
-            {/* Footer - White/Clean */}
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                <Button variant="bordered" onPress={() => setIsRequestsModalOpen(false)} className="w-full">
-                    Close
-                </Button>
-            </div>
-        </div>
-    </div>
-)}
+                        {/* Content */}
+                        <div className="flex-1 overflow-y-auto p-6">
+                            {adoptions.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <p className="text-gray-500 dark:text-gray-400">No adoption requests yet.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {adoptions.map((adoption) => (
+                                        <div key={adoption.id} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <User size={14} className="text-teal-500" />
+                                                        <span className="font-semibold text-gray-800 dark:text-white">
+                                                            {adoption.userName}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                                        <Mail size={12} />
+                                                        {adoption.userEmail}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                                        <Calendar size={12} />
+                                                        Pickup: {new Date(adoption.pickUpDate).toLocaleDateString()}
+                                                    </div>
+                                                    {adoption.message && (
+                                                        <div className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                                            <MessageCircle size={12} className="text-teal-500 mt-0.5" />
+                                                            <span className="italic">{adoption.message}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col items-end gap-2">
+                                                    {adoption.status === "pending" && (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                            <Clock size={10} />
+                                                            Pending
+                                                        </span>
+                                                    )}
+                                                    {adoption.status === "approved" && (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                                            <CheckCircle size={10} />
+                                                            Approved
+                                                        </span>
+                                                    )}
+                                                    {adoption.status === "rejected" && (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                                            <XCircle size={10} />
+                                                            Rejected
+                                                        </span>
+                                                    )}
+                                                    <Button
+                                                        size="sm"
+                                                        variant="light"
+                                                        onPress={() => console.log("View user:", request.userId)}
+                                                        startContent={<User size={12} />}
+                                                        className="text-blue-600 dark:text-blue-400"
+                                                    >
+                                                        View User
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            {adoption.status === "pending" && (
+                                                <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                                    <Button
+                                                        size="sm"
+                                                        color="success"
+                                                        onClick={() => handleApproveRequest(adoption._id)}
+                                                        startContent={<CheckCircle size={14} />}
+                                                        className="bg-green-600 text-white"
+                                                    >
+                                                        Approve
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        color="danger"
+                                                        variant="danger"
+                                                        onClick={() => handleRejectRequest(adoption._id)}
+                                                        startContent={<XCircle size={14} />}
+                                                    >
+                                                        Reject
+                                                    </Button>
+                                                </div>
+                                             )} 
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+
+                        {/* Footer - White/Clean */}
+                        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                            <Button variant="outline" onPress={() => setIsRequestsModalOpen(false)} className="w-full">
+                                Close
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* ========== DELETE CONFIRMATION MODAL ========== */}
             {isDeleteModalOpen && petToDelete && (
@@ -713,7 +665,7 @@ const MyListingsPage = () => {
                                 Cancel
                             </Button>
                             <Button
-                                color="danger"
+                                variant="danger"
                                 onPress={handleDeleteConfirm}
                                 startContent={<Trash2 size={14} />}
                                 className="flex-1"

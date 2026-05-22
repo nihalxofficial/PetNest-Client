@@ -54,3 +54,26 @@ export const requestAdoption = async(id, adoptionData)=> {
     }
     return data;
 }
+
+
+export const approveAdoption = async(id)=>{
+    const res = await fetch(`${Api}/adoptions/approve/${id}`,{
+        method: "PATCH"
+    })
+    const data = await res.json();
+    if(data.result.modifiedCount>0){
+        revalidatePath(Api+"/dashboard/my-listings")
+    }
+    return data;
+}
+
+export const rejectAdoption = async(id)=>{
+    const res = await fetch(`${Api}/adoptions/reject/${id}`,{
+        method: "PATCH"
+    })
+    const data = await res.json();
+    if(data.result.modifiedCount>0){
+        revalidatePath(Api+"/dashboard/my-listings")
+    }
+    return data;
+}
