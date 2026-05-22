@@ -26,9 +26,9 @@ export const updatePetData = async (id, data)=> {
         body: JSON.stringify(data)
     });
     const result = await res.json();
-    if(result.modifiedCount>0){
-        revalidatePath(`${Api}/pets/${id}`)
-    }
+    // if(result.modifiedCount>0){
+    //     revalidatePath(`${Api}/pets/${id}`)
+    // }
     return data;
 }
 

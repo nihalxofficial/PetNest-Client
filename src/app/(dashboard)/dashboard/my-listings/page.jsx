@@ -38,7 +38,8 @@ import {
 import { getAdoptionByPet, getPetByOwner } from "@/lib/pets/data";
 import { authClient } from "@/lib/auth-client";
 import { CircleCheckFill } from "@gravity-ui/icons";
-import { approveAdoption, rejectAdoption } from "@/lib/pets/action";
+import { approveAdoption, deletePetData, rejectAdoption, updatePetData } from "@/lib/pets/action";
+import { toast } from "react-toastify";
 
 
 const MyListingsPage = () => {
@@ -48,16 +49,35 @@ const MyListingsPage = () => {
     const [petToDelete, setPetToDelete] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    // Edit form states
     const [species, setSpecies] = useState("");
     const [gender, setGender] = useState("");
     const [healthStatus, setHealthStatus] = useState("");
-    const [vaccination, setVaccination] = useState("");
+    const [vaccination, setVaccination] = useState("not-vaccinated");
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const data = Object.fromEntries(formData.entries());
+        const updateData = {
+            ...data,
+            fee: Number(data.fee),
+            species,
+            gender,
+            healthStatus,
+            vaccination: Boolean(vaccination),
+        };
+        const result = await updatePetData(selectedPet._id, updateData);
+        if (result) {
+            toast.success("Data Updated!")
+        }
+    }
 
-    // Stats calculations
-    // const totalListings = listings.length;
-    // const availablePets = listings.filter(pet => pet.status === "available").length;
-    // const adoptedPets = listings.filter(pet => pet.status === "adopted").length;
+    const handleDelete = async () => {
+        const result = await deletePetData(petData._id);
+        if (result.deletedCount > 0) {
+            toast.warning(`${selectedPet.name} is deleted from listings`)
+            router.push("/all-pets")
+        }
+    }
 
     const { data: session } = authClient.useSession()
     const ownerID = session?.user?.id;
@@ -84,10 +104,11 @@ const MyListingsPage = () => {
         fetchData();
     }, [ownerID, selectedPet?._id]);
 
-    // console.log(selectedPet);
-    // console.log("Adoptions", adoptions);
-    // console.log("Listings", listings);
-    
+    // Stats calculations
+    const totalListings = listings.length;
+    const availablePets = listings.filter(pet => pet.status === "available").length;
+    const adoptedPets = listings.filter(pet => pet.status === "adopted").length;
+
 
     const handleViewRequests = (pet) => {
         setSelectedPet(pet);
@@ -108,23 +129,14 @@ const MyListingsPage = () => {
         setIsDeleteModalOpen(true);
     };
 
-    const handleDeleteConfirm = () => {
 
-    };
-
-    const handleApproveRequest = async(adoptionId) => {
+    const handleApproveRequest = async (adoptionId) => {
         const data = await approveAdoption(adoptionId)
-        console.log(data);
-        
+
     };
 
-    const handleRejectRequest = async(adoptionId) => {
+    const handleRejectRequest = async (adoptionId) => {
         const data = await rejectAdoption(adoptionId)
-        console.log(data); 
-    };
-
-    const handleEditSubmit = (e) => {
-
     };
 
     const StatusChip = ({ status }) => {
@@ -175,7 +187,7 @@ const MyListingsPage = () => {
                     <div className="p-4 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Total Listings</p>
-                            <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalListings}</p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/50 flex items-center justify-center">
                             <PawPrint size={24} className="text-teal-600 dark:text-teal-400" />
@@ -187,7 +199,7 @@ const MyListingsPage = () => {
                     <div className="p-4 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Available Pets</p>
-                            <p className="text-3xl font-bold text-green-600 dark:text-green-400">0</p>
+                            <p className="text-3xl font-bold text-green-600 dark:text-green-400">{availablePets}</p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
                             <CheckCircle size={24} className="text-green-600 dark:text-green-400" />
@@ -199,7 +211,7 @@ const MyListingsPage = () => {
                     <div className="p-4 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Adopted Pets</p>
-                            <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">0</p>
+                            <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">{adoptedPets}</p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
                             <Heart size={24} className="text-rose-600 dark:text-rose-400" />
@@ -353,7 +365,7 @@ const MyListingsPage = () => {
                             </Modal.Header>
 
                             <Modal.Body className="p-6">
-                                <form onSubmit={handleEditSubmit} className="space-y-4">
+                                <form onSubmit={onSubmit} className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {/* Pet Name */}
                                         <TextField defaultValue={selectedPet?.name} name="name">
@@ -624,7 +636,7 @@ const MyListingsPage = () => {
                                                         Reject
                                                     </Button>
                                                 </div>
-                                             )} 
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -666,7 +678,7 @@ const MyListingsPage = () => {
                             </Button>
                             <Button
                                 variant="danger"
-                                onPress={handleDeleteConfirm}
+                                onPress={handleDelete}
                                 startContent={<Trash2 size={14} />}
                                 className="flex-1"
                             >

@@ -36,7 +36,6 @@ const OwnerRightContainer = ({ petData }) => {
             toast.warning(`${petData.name} is deleted from listings`)
             router.push("/all-pets")
         }
-        console.log(result);
     }
     return (
         // Owner View - Edit and Delete buttons only
@@ -96,7 +95,7 @@ const OwnerRightContainer = ({ petData }) => {
                                                 </TextField>
 
                                                 {/* Age */}
-                                                <TextField defaultValue={petData.age} isRequired name="age">
+                                                <TextField defaultValue={petData.age} name="age">
                                                     <Label className="flex items-center gap-1">
                                                         <Calendar size={14} className="text-teal-500" />
                                                         Age <span className="text-red-500">*</span>
