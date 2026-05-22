@@ -66,18 +66,28 @@ const MyListingsPage = () => {
             vaccination: Boolean(vaccination),
         };
         const result = await updatePetData(selectedPet._id, updateData);
+        setIsEditModalOpen(false);
         if (result) {
             toast.success("Data Updated!")
         }
     }
 
-    const handleDelete = async () => {
-        const result = await deletePetData(petData._id);
-        if (result.deletedCount > 0) {
-            toast.warning(`${selectedPet.name} is deleted from listings`)
-            router.push("/all-pets")
+    const handleDelete = async (id) => {
+        const result = await deletePetData(petToDelete._id);
+
+        if (result?.deletedCount > 0) {
+            toast.warning(`${petToDelete.name} is deleted from listings`);
+
+            setListings((prev) =>
+                prev.filter((pet) => pet._id !== petToDelete._id)
+            );
+
+            // cleanup UI state
+            setIsDeleteModalOpen(false);
+            setPetToDelete(null);
+            // setSelectedPet(null);
         }
-    }
+    };
 
     const { data: session } = authClient.useSession()
     const ownerID = session?.user?.id;
@@ -223,7 +233,7 @@ const MyListingsPage = () => {
             {/* Listings Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {listings.map((pet) => (
-                    <Card key={pet.id} className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 overflow-hidden">
+                    <Card key={pet._id} className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 overflow-hidden">
                         <div className="flex flex-col sm:flex-row">
                             {/* Pet Image */}
                             <div className="relative w-full sm:w-40 h-40 sm:h-auto">
@@ -290,18 +300,18 @@ const MyListingsPage = () => {
                                     <Button
                                         size="sm"
                                         variant="bordered"
-                                        as={Link}
-                                        href={`/all-pets/${pet.id}`}
+                                        // as={Link}
+                                        // href={`/all-pets/${pet.id}`}
                                         startContent={<Eye size={14} />}
                                         className="border-blue-500 text-blue-600"
                                     >
-                                        View
+                                        <Link href={`/all-pets/${pet._id}`}>View</Link>
                                     </Button>
                                     {/* Edit Button → opens Update Pet Modal */}
                                     <Button
                                         size="sm"
                                         variant="bordered"
-                                        onPress={() => handleEditPet(pet)}
+                                        onClick={() => handleEditPet(pet)}
                                         startContent={<Edit size={14} />}
                                         className="border-amber-500 text-amber-600"
                                     >
@@ -311,7 +321,7 @@ const MyListingsPage = () => {
                                     <Button
                                         size="sm"
                                         variant="bordered"
-                                        onPress={() => handleDeleteClick(pet)}
+                                        onClick={() => handleDeleteClick(pet)}
                                         startContent={<Trash2 size={14} />}
                                         className="border-red-500 text-red-600"
                                     >
