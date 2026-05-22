@@ -1,4 +1,3 @@
-// app/pets/[id]/page.jsx
 
 import Image from "next/image";
 import Link from "next/link";
@@ -35,6 +34,7 @@ const PetDetailsPage = async ({ params }) => {
     const { id } = await params
 
     const petData = await getPetById(id);
+    console.log(petData);
 
     const session = await auth.api.getSession({
         headers: await headers()
@@ -44,7 +44,7 @@ const PetDetailsPage = async ({ params }) => {
     const ownerID = petData?.ownerID;
     const owner = await getUserById(ownerID);
 
-    const isOwner = user?.email === owner?.email;
+    const isOwner = user?.email === petData?.ownerEmail;
 
     return (
         <div className="min-h-screen bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30 py-8 px-4 sm:px-6 lg:px-8">

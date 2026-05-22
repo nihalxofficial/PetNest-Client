@@ -24,12 +24,46 @@ import {
     FileText,
     PlusCircle,
 } from "lucide-react";
+import { addPetData } from "@/lib/pets/action";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { authClient } from "@/lib/auth-client";
+import { getUserByEmail } from "@/lib/pets/data";
 
 const AddPetPage = () => {
+    const router = useRouter();
     const [species, setSpecies] = useState("");
     const [gender, setGender] = useState("");
     const [healthStatus, setHealthStatus] = useState("");
     const [vaccination, setVaccination] = useState("");
+
+    const { data: session } = authClient.useSession() 
+        const ownerEmail = session?.user?.email;
+        const ownerID = session?.user?.id;
+
+    const onSubmit = async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.currentTarget);
+            const data = Object.fromEntries(formData.entries());
+            const petData = {
+                ownerID,
+                ownerEmail,
+                ...data,
+                fee: Number(data.fee),
+                species,
+                gender,
+                healthStatus,
+                vaccination: Boolean(vaccination),
+            };
+
+            const result = await addPetData(petData);
+            if(result.insertedId){
+                toast.success("New Pet Added!")
+                
+                router.push("/dashboard/my-listings")
+            }
+        }
 
     return (
         <div className="max-w-5xl mx-auto">
@@ -51,7 +85,7 @@ const AddPetPage = () => {
             {/* Form Card */}
             <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50">
                 <div className="p-6">
-                    <form className="space-y-4">
+                    <form onSubmit={onSubmit} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Pet Name */}
                             <TextField name="name">
@@ -207,7 +241,7 @@ const AddPetPage = () => {
                             <Button variant="outline" className="flex-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">
                                 Cancel
                             </Button>
-                            <Button type="submit" className="flex-1 bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300">
+                            <Button type="submit" className="flex-1 bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300">
                                 Add Pet
                             </Button>
                         </div>

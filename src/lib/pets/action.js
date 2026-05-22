@@ -4,6 +4,18 @@ import { revalidatePath } from "next/cache";
 
 const Api = process.env.NEXT_PUBLIC_API;
 
+export const addPetData = async(data)=>{
+    const res = await fetch(`${Api}/pets`, {
+        method: "POST",
+        headers: {
+            "Content-Type" : "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+    const result = await res.json();
+    return result;
+}
+
 
 export const updatePetData = async (id, data)=> {
     const res = await fetch(`${Api}/pets/${id}`,{

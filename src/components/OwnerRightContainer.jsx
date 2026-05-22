@@ -16,6 +16,7 @@ const OwnerRightContainer = ({ petData }) => {
         const data = Object.fromEntries(formData.entries());
         const updateData = {
             ...data,
+            fee: Number(data.fee),
             species,
             gender,
             healthStatus,
