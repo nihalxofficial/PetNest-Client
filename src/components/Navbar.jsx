@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -30,6 +31,7 @@ import { useRouter } from "next/navigation";
 
 const PetNestNavbar = () => {
     const router = useRouter();
+    const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -81,6 +83,14 @@ const PetNestNavbar = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
 
+    // Check if link is active
+    const isActiveLink = (href) => {
+        if (href === "/") {
+            return pathname === href;
+        }
+        return pathname.startsWith(href);
+    };
+
     if (!mounted) {
         return null;
     }
@@ -109,15 +119,25 @@ const PetNestNavbar = () => {
                     <div className="hidden lg:flex items-center gap-8 xl:gap-10">
                         {menuItems.map((item, index) => {
                             const Icon = item.icon;
+                            const isActive = isActiveLink(item.href);
                             return (
                                 <Link
                                     key={index}
                                     href={item.href}
-                                    className="group relative flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 transition-all duration-300 font-medium"
+                                    className={`group relative flex items-center gap-2 transition-all duration-300 font-medium ${
+                                        isActive
+                                            ? "text-teal-600 dark:text-teal-400"
+                                            : "text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400"
+                                    }`}
                                 >
-                                    <Icon size={16} className="text-teal-500" />
+                                    <Icon 
+                                        size={16} 
+                                        className={isActive ? "text-teal-600 dark:text-teal-400" : "text-teal-500"} 
+                                    />
                                     {item.name}
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-teal-500 to-emerald-500 transition-all duration-300 group-hover:w-full"></span>
+                                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-linear-to-r from-teal-500 to-emerald-500 transition-all duration-300 ${
+                                        isActive ? "w-full" : "w-0 group-hover:w-full"
+                                    }`} />
                                 </Link>
                             );
                         })}
@@ -180,7 +200,6 @@ const PetNestNavbar = () => {
                                         </p>
                                         <p className="text-[10px] text-gray-500 dark:text-gray-400">Member</p>
                                     </div>
-                                    {/* <ChevronDown size={14} className="text-gray-500 hidden md:block" /> */}
                                 </button>
 
                                 {/* Dropdown Menu - Only for Desktop (lg screens) */}
@@ -224,24 +243,8 @@ const PetNestNavbar = () => {
                                                     <LayoutDashboard size={16} className="text-teal-500" />
                                                     Dashboard
                                                 </Link>
-                                                {/* <Link
-                                                    href="/my-pets"
-                                                    onClick={() => setIsDropdownOpen(false)}
-                                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                                >
-                                                    <Heart size={16} className="text-teal-500" />
-                                                    My Pets
-                                                </Link>
                                                 <Link
-                                                    href="/my-listings"
-                                                    onClick={() => setIsDropdownOpen(false)}
-                                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                                >
-                                                    <List size={16} className="text-teal-500" />
-                                                    My Listings
-                                                </Link> */}
-                                                <Link
-                                                    href="/settings"
+                                                    href="/dashboard/settings"
                                                     onClick={() => setIsDropdownOpen(false)}
                                                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                                 >
@@ -301,7 +304,7 @@ const PetNestNavbar = () => {
                     </div>
                 </div>
 
-                {/* Mobile Menu - Only shows nav links, NOT dropdown items */}
+                {/* Mobile Menu */}
                 <AnimatePresence>
                     {isMenuOpen && (
                         <motion.div
@@ -316,14 +319,19 @@ const PetNestNavbar = () => {
                                     {/* Navigation Links */}
                                     {menuItems.map((item, index) => {
                                         const Icon = item.icon;
+                                        const isActive = isActiveLink(item.href);
                                         return (
                                             <Link
                                                 key={index}
                                                 href={item.href}
                                                 onClick={() => setIsMenuOpen(false)}
-                                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all text-gray-700 dark:text-gray-300"
+                                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                                                    isActive
+                                                        ? "bg-gradient-to-r from-teal-600 to-emerald-500 text-white"
+                                                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                                }`}
                                             >
-                                                <Icon size={18} className="text-teal-500" />
+                                                <Icon size={18} className={isActive ? "text-white" : "text-teal-500"} />
                                                 {item.name}
                                             </Link>
                                         );

@@ -34,7 +34,6 @@ const PetDetailsPage = async ({ params }) => {
     const { id } = await params
 
     const petData = await getPetById(id);
-    console.log(petData);
 
     const session = await auth.api.getSession({
         headers: await headers()

@@ -35,11 +35,11 @@ export const getUserById = async (id)=> {
     return user;
 }
 
-export const getUserByEmail = async (email) => {
-  const res = await fetch(`${Api}/users?email=${email}`);
-  const user = await res.json();
-  return user;
-};
+// export const getUserByEmail = async (email) => {
+//   const res = await fetch(`${Api}/users?email=${email}`);
+//   const user = await res.json();
+//   return user;
+// };
 
 
 
