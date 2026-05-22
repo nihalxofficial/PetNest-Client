@@ -25,6 +25,8 @@ import {
     VenetianMask,
     Eye,
     ShoppingBag,
+    Frown,
+    Sparkles,
 } from "lucide-react";
 
 import { getPets } from "@/lib/pets/data";
@@ -36,6 +38,7 @@ import GridPetCard from "@/components/GridPetCard";
 import ListPetCard from "@/components/ListPetCard";
 import { GridPetCardSkeleton } from "@/components/GridPetCardSkeleton";
 import { ListPetCardSkeleton } from "@/components/ListPetCardSkeleton";
+import Link from "next/link";
 
 const AllPetsPage = () => {
 
@@ -60,7 +63,7 @@ const AllPetsPage = () => {
 
     const [petsData, setPetsData] = useState([])
     const searchParams = useSearchParams();
-    
+
     useEffect(() => {
         const fetchPets = async () => {
             setIsLoading(true);
@@ -252,8 +255,71 @@ const AllPetsPage = () => {
                             </div>
                         )}
 
+                        {/* No Pets Available Section */}
+                        {!isLoading && petsData.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                                {/* Animated Icon */}
+                                <div className="relative mb-6">
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="w-24 h-24 rounded-full bg-amber-500/10 animate-ping" />
+                                    </div>
+                                    <div className="relative bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/50 dark:to-amber-800/50 p-5 rounded-full">
+                                        <Frown size={48} className="text-amber-600 dark:text-amber-400" />
+                                    </div>
+                                </div>
+
+                                {/* Title */}
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                                    No Pets Available
+                                </h3>
+
+                                {/* Description */}
+                                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6">
+                                    We couldn't find any pets matching your criteria. Try adjusting your filters or check back later for new arrivals.
+                                </p>
+
+                                {/* Suggestions */}
+                                {/* <div className="bg-white/50 dark:bg-gray-800/50 rounded-xl p-4 max-w-sm mx-auto mb-6">
+                                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center justify-center gap-2">
+                                        <Sparkles size={14} className="text-teal-500" />
+                                        Suggestions
+                                        <Sparkles size={14} className="text-teal-500" />
+                                    </p>
+                                    <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                                        <li>• Try removing some filters</li>
+                                        <li>• Check the &quot;Available&quot; filter option</li>
+                                        <li>• Browse all pets without species restrictions</li>
+                                        <li>• Check back soon as new pets are added daily</li>
+                                    </ul>
+                                </div> */}
+
+                                {/* Action Buttons */}
+                                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedSpecies([]);
+                                            setPriceRange([0, 200]);
+                                        }}
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 border border-teal-500 text-teal-700 dark:border-teal-400 dark:text-teal-400 font-medium rounded-full hover:bg-teal-50 dark:hover:bg-teal-950/30 transition-all duration-300"
+                                    >
+                                        <X size={16} />
+                                        <Link href={"/all-pets"}>
+
+                                            Reset All Filters
+                                        </Link>
+                                    </button>
+                                    <button className="inline-flex cursor-pointer items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                                        <PawPrint size={16} />
+                                        <Link href="/">
+                                            Back to Home
+                                        </Link>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Grid View */}
-                        {!isLoading && viewMode === "grid" && (
+                        {!isLoading && petsData.length > 0 && viewMode === "grid" && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {petsData.map((pet) => (
                                     <GridPetCard key={pet._id} pet={pet} />
@@ -262,7 +328,7 @@ const AllPetsPage = () => {
                         )}
 
                         {/* List View */}
-                        {!isLoading && viewMode === "list" && (
+                        {!isLoading && petsData.length > 0 && viewMode === "list" && (
                             <div className="space-y-4">
                                 {petsData.map((pet) => (
                                     <ListPetCard key={pet._id} pet={pet} />
