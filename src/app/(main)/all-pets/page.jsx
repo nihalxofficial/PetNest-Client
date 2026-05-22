@@ -129,110 +129,93 @@ const AllPetsPage = () => {
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Sidebar Filters */}
+                    {/* Sidebar Filters - STICKY */}
                     <div
                         className={`lg:block ${isFilterOpen ? "block" : "hidden"
                             } lg:block w-full lg:w-80 shrink-0`}
                     >
-                        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-gray-700/50 p-5">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <Filter size={18} className="text-teal-500" />
-                                    Filters
-                                </h3>
-                                <button
-                                    onClick={() => setIsFilterOpen(false)}
-                                    className="lg:hidden p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-                                >
-                                    <X size={18} />
-                                </button>
-                            </div>
-
-                            <div className="mb-6">
-                                <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Species</h4>
-                                <div className="space-y-2">
-                                    {["dog", "cat", "bird", "rabbit"].map((species) => (
-                                        <label key={species} className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedSpecies.includes(species)}
-                                                onChange={() => toggleSpecies(species)}
-                                                className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                                            />
-                                            <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">
-                                                {species}s
-                                            </span>
-                                        </label>
-                                    ))}
+                        <div className="sticky top-24">
+                            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-gray-700/50 p-5">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <Filter size={18} className="text-teal-500" />
+                                        Filters
+                                    </h3>
+                                    <button
+                                        onClick={() => setIsFilterOpen(false)}
+                                        className="lg:hidden p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                                    >
+                                        <X size={18} />
+                                    </button>
                                 </div>
-                            </div>
 
-                            {/* <div className="mb-6">
-                                <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Size</h4>
-                                <div className="space-y-2">
-                                    {["male", "female"].map((size) => (
-                                        <label key={size} className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedSize.includes(size)}
-                                                onChange={() => toggleSize(size)}
-                                                className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                                            />
-                                            <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">
-                                                {size}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div> */}
-
-                            <div className="mb-6">
-                                <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Price Range</h4>
-                                <div className="space-y-3">
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="200"
-                                        value={priceRange[1]}
-                                        onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-                                    />
-                                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                                        <span>${priceRange[0]}</span>
-                                        <span>${priceRange[1]}</span>
+                                <div className="mb-6">
+                                    <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Species</h4>
+                                    <div className="space-y-2">
+                                        {["dog", "cat", "bird", "rabbit"].map((species) => (
+                                            <label key={species} className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedSpecies.includes(species)}
+                                                    onChange={() => toggleSpecies(species)}
+                                                    className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                                />
+                                                <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">
+                                                    {species}s
+                                                </span>
+                                            </label>
+                                        ))}
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="mb-6">
-                                <h4 className="font-semibold text-gray-800 dark:text-white mb-3">More Filters</h4>
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
-                                        <span className="text-sm text-gray-700 dark:text-gray-300">Vaccinated</span>
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
-                                        <span className="text-sm text-gray-700 dark:text-gray-300">Healthy</span>
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
-                                        <span className="text-sm text-gray-700 dark:text-gray-300">Available</span>
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
-                                        <span className="text-sm text-gray-700 dark:text-gray-300">Adopted</span>
-                                    </label>
+                                <div className="mb-6">
+                                    <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Price Range</h4>
+                                    <div className="space-y-3">
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="200"
+                                            value={priceRange[1]}
+                                            onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                                        />
+                                        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                            <span>${priceRange[0]}</span>
+                                            <span>${priceRange[1]}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <button className="flex-1 cursor-pointer px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                                    Reset All
-                                </button>
-                                <button className="flex-1 cursor-pointer px-4 py-2 rounded-full bg-linear-to-r from-teal-600 to-emerald-500 text-white font-medium hover:shadow-lg transition">
-                                    Apply Filters
-                                </button>
+                                <div className="mb-6">
+                                    <h4 className="font-semibold text-gray-800 dark:text-white mb-3">More Filters</h4>
+                                    <div className="space-y-2">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
+                                            <span className="text-sm text-gray-700 dark:text-gray-300">Vaccinated</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
+                                            <span className="text-sm text-gray-700 dark:text-gray-300">Healthy</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
+                                            <span className="text-sm text-gray-700 dark:text-gray-300">Available</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500" />
+                                            <span className="text-sm text-gray-700 dark:text-gray-300">Adopted</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <button className="flex-1 cursor-pointer px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                                        Reset All
+                                    </button>
+                                    <button className="flex-1 cursor-pointer px-4 py-2 rounded-full bg-linear-to-r from-teal-600 to-emerald-500 text-white font-medium hover:shadow-lg transition">
+                                        Apply Filters
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
