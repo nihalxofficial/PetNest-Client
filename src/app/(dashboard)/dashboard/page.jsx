@@ -1,4 +1,3 @@
-// app/(dashboard)/dashboard/page.jsx
 "use client";
 
 import React, { useState } from "react";
@@ -208,11 +207,11 @@ const DashboardPage = () => {
                             Welcome back, {data.user.name.split(" ")[0]}! 👋
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-1">
-                            Here's what's happening with your pet adoption journey
+                            Here&apos;s what&apos;s happening with your pet adoption journey
                         </p>
                     </div>
                     <Link href="/dashboard/add-pet">
-                        <Button className="bg-gradient-to-r from-teal-600 to-emerald-500 text-white shadow-md hover:shadow-lg">
+                        <Button className="bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-md hover:shadow-lg">
                             <PlusCircle size={16} className="mr-2" />
                             Add New Pet
                         </Button>

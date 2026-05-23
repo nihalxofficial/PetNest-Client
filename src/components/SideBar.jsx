@@ -16,6 +16,9 @@ import {
     Menu,
     X,
     ChevronLeft,
+    PawPrint,
+    Users,
+    User,
 } from "lucide-react";
 import { Avatar } from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
@@ -48,7 +51,9 @@ const DashboardSidebar = ({ onCollapseChange }) => {
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
         { name: "My Requests", href: "/dashboard/my-requests", icon: Heart },
         { name: "My Listings", href: "/dashboard/my-listings", icon: List },
+        { name: "All Pets", href: "/all-pets", icon: PawPrint },
         { name: "Add Pet", href: "/dashboard/add-pet", icon: Plus },
+        { name: "Profile", href: "/dashboard/profile", icon: User },
         { name: "Settings", href: "/dashboard/settings", icon: Settings },
     ];
 
@@ -77,13 +82,11 @@ const DashboardSidebar = ({ onCollapseChange }) => {
 
             {/* Sidebar */}
             <aside
-                className={`fixed left-0 top-0 h-full z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
-                    isCollapsed ? "w-20" : "w-64"
-                } ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+                className={`fixed left-0 top-0 h-full z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${isCollapsed ? "w-20" : "w-64"
+                    } ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
                 style={{ paddingTop: "64px" }}
             >
                 <div className="flex flex-col h-full">
-                    {/* User Info Section - Uncommented */}
                     {/* <div className={`px-4 py-4 border-b border-gray-200 dark:border-gray-800 ${isCollapsed ? "text-center" : ""}`}>
                         <div className={`flex ${isCollapsed ? "justify-center" : "items-center gap-3"}`}>
                             <Avatar
@@ -115,11 +118,10 @@ const DashboardSidebar = ({ onCollapseChange }) => {
                                     <li key={item.name}>
                                         <Link
                                             href={item.href}
-                                            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
-                                                isActive
+                                            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${isActive
                                                     ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-md"
                                                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                                            } ${isCollapsed ? "justify-center" : ""}`}
+                                                } ${isCollapsed ? "justify-center" : ""}`}
                                         >
                                             <Icon size={20} className={isActive ? "text-white" : "text-teal-500"} />
                                             {!isCollapsed && <span className="text-sm font-medium">{item.name}</span>}
@@ -135,9 +137,8 @@ const DashboardSidebar = ({ onCollapseChange }) => {
                         {/* Theme Toggle */}
                         <button
                             onClick={toggleTheme}
-                            className={`w-full cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 ${
-                                isCollapsed ? "justify-center" : ""
-                            }`}
+                            className={`w-full cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 ${isCollapsed ? "justify-center" : ""
+                                }`}
                         >
                             {theme === "dark" ? (
                                 <Sun size={20} className="text-yellow-500" />
@@ -150,9 +151,8 @@ const DashboardSidebar = ({ onCollapseChange }) => {
                         {/* Sign Out */}
                         <button
                             onClick={handleSignOut}
-                            className={`w-full cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 ${
-                                isCollapsed ? "justify-center" : ""
-                            }`}
+                            className={`w-full cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 ${isCollapsed ? "justify-center" : ""
+                                }`}
                         >
                             <LogOut size={20} />
                             {!isCollapsed && <span className="text-sm font-medium">Sign Out</span>}
