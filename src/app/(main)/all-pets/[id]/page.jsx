@@ -26,6 +26,7 @@ import {
     CheckCircle,
     Info,
     Clock,
+    XCircle,
 } from "lucide-react";
 import AdoptionForm from "@/components/AdoptionForm";
 import OwnerRightContainer from "@/components/OwnerRightContainer";
@@ -34,14 +35,10 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { PetDetailsPageSkeleton } from "@/components/PetDetailsPageSkeleton";
 
-// Full Page Skeleton Component
-
-
 const PetDetailsPage = async ({ params }) => {
     const { id } = await params
 
     const petData = await getPetById(id);
-    
 
     const session = await auth.api.getSession({
         headers: await headers()
@@ -53,11 +50,6 @@ const PetDetailsPage = async ({ params }) => {
 
     const isOwner = user?.email === petData?.ownerEmail;
 
-    // Show skeleton while data is loading
-    if (!petData || !owner) {
-        return <PetDetailsPageSkeleton />;
-    }
-
     return (
         <div className="min-h-screen bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30 py-8 px-4 sm:px-6 lg:px-8">
             <div className="container mx-auto max-w-7xl">
@@ -65,7 +57,6 @@ const PetDetailsPage = async ({ params }) => {
                 <Button
                     variant="light"
                     className="mb-6 text-teal-600 dark:text-teal-400"
-
                 >
                     <Link href={"/all-pets"} className="flex justify-between items-center gap-2">
                         <PawPrint size={16} />
@@ -184,33 +175,45 @@ const PetDetailsPage = async ({ params }) => {
                                         Health & Status
                                     </h3>
                                     <div className="flex flex-wrap gap-3">
-                                        {petData.vaccinated && (
+                                        {/* Vaccination — true/false boolean */}
+                                        {petData.vaccinated === true ? (
                                             <Chip
                                                 variant="flat"
                                                 color="success"
-                                                startContent={<CheckCircle size={14} />}
+                                                className="bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-400"
                                             >
-                                                Vaccinated
+                                                <div className="flex items-center gap-1.5">
+                                                    <CheckCircle size={14} />
+                                                    Vaccinated
+                                                </div>
+                                            </Chip>
+                                        ) : (
+                                            <Chip
+                                                variant="flat"
+                                                color="danger"
+                                                className="bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-400"
+                                            >
+                                                <div className="flex items-center gap-1.5">
+                                                    <XCircle size={14} />
+                                                    Not Vaccinated
+                                                </div>
                                             </Chip>
                                         )}
-                                        {petData.neutered && (
+
+                                        {/* Microchipped — only show if true */}
+                                        {petData.microchipped === true && (
                                             <Chip
                                                 variant="flat"
                                                 color="success"
-                                                startContent={<CheckCircle size={14} />}
+                                                className="bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-400"
                                             >
-                                                Neutered/Spayed
+                                                <div className="flex items-center gap-1.5">
+                                                    <CheckCircle size={14} />
+                                                    Microchipped
+                                                </div>
                                             </Chip>
                                         )}
-                                        {petData.microchipped && (
-                                            <Chip
-                                                variant="flat"
-                                                color="success"
-                                                startContent={<CheckCircle size={14} />}
-                                            >
-                                                Microchipped
-                                            </Chip>
-                                        )}
+
                                         <Chip
                                             variant="flat"
                                             color="primary"
@@ -282,7 +285,7 @@ const PetDetailsPage = async ({ params }) => {
                                             </p>
                                             <Button className="w-full bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold">
                                                 <Link href="/all-pets" className="flex items-center gap-2">
-                                                <PawPrint size={16} />
+                                                    <PawPrint size={16} />
                                                     Browse Other Pets
                                                 </Link>
                                             </Button>

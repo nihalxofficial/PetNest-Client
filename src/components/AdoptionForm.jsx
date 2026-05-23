@@ -38,20 +38,21 @@ const AdoptionForm = ({ id, petData, user }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        
+
         const formData = new FormData(e.currentTarget);
         const requestData = Object.fromEntries(formData.entries());
-        
+
         const nativeDate = date ? date.toDate(getLocalTimeZone()) : null;
 
         const modifiedData = {
             petId: id,
+            petImage: petData.image,
             userId: user.id,
             ...requestData,
             status: "pending",
             pickUpDate: nativeDate
         };
-        
+
         try {
             const data = await requestAdoption(id, modifiedData);
             if (data.insertedId) {
@@ -82,24 +83,24 @@ const AdoptionForm = ({ id, petData, user }) => {
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                         The shelter will review your request and contact you within 24-48 hours.
-                        Your request status will be updated to "Approved" or "Rejected" soon.
+                        Your request status will be updated to &quot;Approved&quot; or &quot;Rejected&quot; soon.
                     </p>
                     <div className="flex flex-col gap-3">
-                        <Link href="/dashboard/my-requests">
-                            <Button className="w-full bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300">
+                        <Button className="w-full bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300">
+                            <Link href="/dashboard/my-requests">
                                 Go to My Requests
-                            </Button>
-                        </Link>
-                        <Link href="/all-pets">
-                            <Button variant="bordered" className="w-full">
+                            </Link>
+                        </Button>
+                        <Button variant="bordered" className="w-full">
+                            <Link href="/all-pets">
                                 Browse More Pets
-                            </Button>
-                        </Link>
+                            </Link>
+                        </Button>
                     </div>
                     <div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
                         <p className="text-xs text-amber-700 dark:text-amber-400 flex items-center justify-center gap-1">
                             <Info size={12} className="text-amber-500" />
-                            You can track your request status in "My Requests" page
+                            You can track your request status in &quot;My Requests&quot; page
                         </p>
                     </div>
                 </div>
@@ -214,18 +215,18 @@ const AdoptionForm = ({ id, petData, user }) => {
                     </div>
 
                     {/* Status Note */}
-                    <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                    {/* <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
                         <p className="text-xs text-amber-700 dark:text-amber-400 flex items-center gap-1">
                             <Info size={12} className="text-amber-500" />
                             Your request will be sent to the shelter for review. Status will be set to &quot;pending&quot; until approved.
                         </p>
-                    </div>
+                    </div> */}
 
                     {/* Adopt Button */}
                     <Button
                         type="submit"
                         size="lg"
-                        className="w-full bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                        className="w-full bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                         startContent={<Heart size={16} />}
                         isLoading={isSubmitting}
                     >

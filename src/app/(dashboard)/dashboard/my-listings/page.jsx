@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -41,6 +41,8 @@ import { CircleCheckFill } from "@gravity-ui/icons";
 import { approveAdoption, deletePetData, rejectAdoption, updatePetData } from "@/lib/pets/action";
 import { toast } from "react-toastify";
 
+// Poll interval for new adoption requests (in ms)
+const POLL_INTERVAL = 15000;
 
 const MyListingsPage = () => {
     const [selectedPet, setSelectedPet] = useState(null);
@@ -53,6 +55,78 @@ const MyListingsPage = () => {
     const [gender, setGender] = useState("");
     const [healthStatus, setHealthStatus] = useState("");
     const [vaccination, setVaccination] = useState("not-vaccinated");
+
+    const { data: session } = authClient.useSession();
+    const ownerID = session?.user?.id;
+
+    const [adoptions, setAdoptions] = useState([]);
+    const [listings, setListings] = useState([]);
+
+    // Ref to track the currently open pet for polling without stale closure
+    const selectedPetRef = useRef(null);
+    selectedPetRef.current = selectedPet;
+
+    // ─── Initial data fetch ───────────────────────────────────────────────────
+    useEffect(() => {
+        if (!ownerID) return;
+        const fetchListings = async () => {
+            try {
+                const listingsData = await getPetByOwner(ownerID);
+                setListings(listingsData);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchListings();
+    }, [ownerID]);
+
+    // ─── Fetch adoptions whenever selectedPet changes ─────────────────────────
+    const fetchAdoptions = useCallback(async (petId) => {
+        if (!petId) return;
+        try {
+            const adoptionData = await getAdoptionByPet(petId);
+            setAdoptions(adoptionData);
+        } catch (error) {
+            console.error(error);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!selectedPet?._id) return;
+        fetchAdoptions(selectedPet._id);
+    }, [selectedPet?._id, fetchAdoptions]);
+
+    // ─── Auto-poll for new adoption requests while modal is open ─────────────
+    useEffect(() => {
+        if (!isRequestsModalOpen) return;
+
+        const interval = setInterval(() => {
+            const pet = selectedPetRef.current;
+            if (pet?._id) {
+                getAdoptionByPet(pet._id)
+                    .then((fresh) => {
+                        setAdoptions((prev) => {
+                            // Only update if something actually changed (avoid unnecessary re-renders)
+                            if (JSON.stringify(fresh) !== JSON.stringify(prev)) {
+                                return fresh;
+                            }
+                            return prev;
+                        });
+                    })
+                    .catch(console.error);
+            }
+        }, POLL_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, [isRequestsModalOpen]);
+
+    // ─── Stats ────────────────────────────────────────────────────────────────
+    const totalListings = listings.length;
+    const availablePets = listings.filter((pet) => pet.status === "available").length;
+    const adoptedPets = listings.filter((pet) => pet.status === "adopted").length;
+
+    // ─── Handlers ─────────────────────────────────────────────────────────────
+
     const onSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
@@ -65,60 +139,47 @@ const MyListingsPage = () => {
             healthStatus,
             vaccination: Boolean(vaccination),
         };
-        const result = await updatePetData(selectedPet._id, updateData);
-        setIsEditModalOpen(false);
-        if (result) {
-            toast.success("Data Updated!")
-        }
-    }
 
-    const handleDelete = async (id) => {
+        // Optimistic update — reflect changes in the grid immediately
+        setListings((prev) =>
+            prev.map((pet) =>
+                pet._id === selectedPet._id ? { ...pet, ...updateData } : pet
+            )
+        );
+
+        setIsEditModalOpen(false);
+
+        try {
+            const result = await updatePetData(selectedPet._id, updateData);
+            if (result) {
+                toast.success("Data Updated!");
+                // Refresh listings from server to stay in sync
+                if (ownerID) {
+                    const fresh = await getPetByOwner(ownerID);
+                    setListings(fresh);
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Update failed. Please try again.");
+            // Rollback: re-fetch from server
+            if (ownerID) {
+                const fresh = await getPetByOwner(ownerID);
+                setListings(fresh);
+            }
+        }
+    };
+
+    const handleDelete = async () => {
         const result = await deletePetData(petToDelete._id);
 
         if (result?.deletedCount > 0) {
             toast.warning(`${petToDelete.name} is deleted from listings`);
-
-            setListings((prev) =>
-                prev.filter((pet) => pet._id !== petToDelete._id)
-            );
-
-            // cleanup UI state
+            setListings((prev) => prev.filter((pet) => pet._id !== petToDelete._id));
             setIsDeleteModalOpen(false);
             setPetToDelete(null);
-            // setSelectedPet(null);
         }
     };
-
-    const { data: session } = authClient.useSession()
-    const ownerID = session?.user?.id;
-
-    const [adoptions, setAdoptions] = useState([])
-    const [listings, setListings] = useState([])
-    useEffect(() => {
-        if (!ownerID) return;
-
-        const fetchData = async () => {
-            try {
-                const listingsData = await getPetByOwner(ownerID);
-                setListings(listingsData);
-
-                if (selectedPet?._id) {
-                    const adoptionData = await getAdoptionByPet(selectedPet._id);
-                    setAdoptions(adoptionData);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchData();
-    }, [ownerID, selectedPet?._id]);
-
-    // Stats calculations
-    const totalListings = listings.length;
-    const availablePets = listings.filter(pet => pet.status === "available").length;
-    const adoptedPets = listings.filter(pet => pet.status === "adopted").length;
-
 
     const handleViewRequests = (pet) => {
         setSelectedPet(pet);
@@ -139,14 +200,45 @@ const MyListingsPage = () => {
         setIsDeleteModalOpen(true);
     };
 
-
+    // ── Approve: optimistic update, then server call ──────────────────────────
     const handleApproveRequest = async (adoptionId) => {
-        const data = await approveAdoption(adoptionId)
-
+        // Immediately reflect "approved" in UI
+        setAdoptions((prev) =>
+            prev.map((a) => (a._id === adoptionId ? { ...a, status: "approved" } : a))
+        );
+        try {
+            await approveAdoption(adoptionId);
+            // Optionally refresh listings so the pet's status badge updates too
+            if (ownerID) {
+                const fresh = await getPetByOwner(ownerID);
+                setListings(fresh);
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to approve. Please try again.");
+            // Rollback
+            setAdoptions((prev) =>
+                prev.map((a) => (a._id === adoptionId ? { ...a, status: "pending" } : a))
+            );
+        }
     };
 
+    // ── Reject: optimistic update, then server call ───────────────────────────
     const handleRejectRequest = async (adoptionId) => {
-        const data = await rejectAdoption(adoptionId)
+        // Immediately reflect "rejected" in UI
+        setAdoptions((prev) =>
+            prev.map((a) => (a._id === adoptionId ? { ...a, status: "rejected" } : a))
+        );
+        try {
+            await rejectAdoption(adoptionId);
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to reject. Please try again.");
+            // Rollback
+            setAdoptions((prev) =>
+                prev.map((a) => (a._id === adoptionId ? { ...a, status: "pending" } : a))
+            );
+        }
     };
 
     const StatusChip = ({ status }) => {
@@ -164,7 +256,7 @@ const MyListingsPage = () => {
                     <Clock width={12} />
                     <Chip.Label>adopting</Chip.Label>
                 </Chip>
-            )
+            );
         }
         return (
             <Chip color="secondary" variant="flat" className="text-rose-500">
@@ -259,7 +351,6 @@ const MyListingsPage = () => {
                                             {pet.breed} • {pet.species}
                                         </p>
                                     </div>
-                                    {/* Adoption Fee / Price */}
                                     <p className="text-lg font-bold text-teal-600 dark:text-teal-400">
                                         ${pet.fee}
                                     </p>
@@ -284,8 +375,6 @@ const MyListingsPage = () => {
 
                                 {/* Action Buttons */}
                                 <div className="flex flex-wrap gap-2 mt-3">
-                                    {/* Requests Button → opens Requests Modal */}
-                                    {/* {pet.status === "available" && pet.requests.length > 0 && ( */}
                                     <Button
                                         size="sm"
                                         variant="bordered"
@@ -295,19 +384,14 @@ const MyListingsPage = () => {
                                     >
                                         Requests
                                     </Button>
-                                    {/*  )} */}
-                                    {/* View Button → navigates to /all-pets/:id */}
                                     <Button
                                         size="sm"
                                         variant="bordered"
-                                        // as={Link}
-                                        // href={`/all-pets/${pet.id}`}
                                         startContent={<Eye size={14} />}
                                         className="border-blue-500 text-blue-600"
                                     >
                                         <Link href={`/all-pets/${pet._id}`}>View</Link>
                                     </Button>
-                                    {/* Edit Button → opens Update Pet Modal */}
                                     <Button
                                         size="sm"
                                         variant="bordered"
@@ -317,7 +401,6 @@ const MyListingsPage = () => {
                                     >
                                         Edit
                                     </Button>
-                                    {/* Delete Button → triggers confirmation modal */}
                                     <Button
                                         size="sm"
                                         variant="bordered"
@@ -377,7 +460,6 @@ const MyListingsPage = () => {
                             <Modal.Body className="p-6">
                                 <form onSubmit={onSubmit} className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {/* Pet Name */}
                                         <TextField defaultValue={selectedPet?.name} name="name">
                                             <Label className="flex items-center gap-1">
                                                 <User size={14} className="text-teal-500" />
@@ -386,7 +468,6 @@ const MyListingsPage = () => {
                                             <Input placeholder="Enter pet name" />
                                         </TextField>
 
-                                        {/* Age */}
                                         <TextField defaultValue={selectedPet?.age} isRequired name="age">
                                             <Label className="flex items-center gap-1">
                                                 <Calendar size={14} className="text-teal-500" />
@@ -395,7 +476,6 @@ const MyListingsPage = () => {
                                             <Input placeholder="e.g., 2 years, 6 months" />
                                         </TextField>
 
-                                        {/* Species */}
                                         <Select value={species} onChange={setSpecies} className="w-full" placeholder="Select Species">
                                             <Label className="flex items-center gap-1">
                                                 <PawPrint size={14} className="text-teal-500" />
@@ -415,7 +495,6 @@ const MyListingsPage = () => {
                                             </Select.Popover>
                                         </Select>
 
-                                        {/* Gender */}
                                         <Select value={gender} onChange={setGender} className="w-full" placeholder="Select Gender">
                                             <Label className="flex items-center gap-1">
                                                 <VenetianMask size={14} className="text-teal-500" />
@@ -433,7 +512,6 @@ const MyListingsPage = () => {
                                             </Select.Popover>
                                         </Select>
 
-                                        {/* Breed */}
                                         <TextField defaultValue={selectedPet?.breed} name="breed">
                                             <Label className="flex items-center gap-1">
                                                 <PawPrint size={14} className="text-teal-500" />
@@ -442,7 +520,6 @@ const MyListingsPage = () => {
                                             <Input placeholder="Enter breed" />
                                         </TextField>
 
-                                        {/* Image URL */}
                                         <TextField defaultValue={selectedPet?.image} type="url" name="image">
                                             <Label className="flex items-center gap-1">
                                                 <Upload size={14} className="text-teal-500" />
@@ -451,7 +528,6 @@ const MyListingsPage = () => {
                                             <Input placeholder="https://example.com/pet-image.jpg" startContent={<Upload size={16} className="text-gray-400" />} />
                                         </TextField>
 
-                                        {/* Health Status */}
                                         <Select value={healthStatus} onChange={setHealthStatus} className="w-full" placeholder="Select Health Status">
                                             <Label className="flex items-center gap-1">
                                                 <Heart size={14} className="text-teal-500" />
@@ -471,7 +547,6 @@ const MyListingsPage = () => {
                                             </Select.Popover>
                                         </Select>
 
-                                        {/* Vaccination Status */}
                                         <Select value={vaccination} onChange={setVaccination} className="w-full" placeholder="Select Vaccination Status">
                                             <Label className="flex items-center gap-1">
                                                 <Syringe size={14} className="text-teal-500" />
@@ -489,7 +564,6 @@ const MyListingsPage = () => {
                                             </Select.Popover>
                                         </Select>
 
-                                        {/* Location */}
                                         <TextField defaultValue={selectedPet?.location} name="location">
                                             <Label className="flex items-center gap-1">
                                                 <MapPin size={14} className="text-teal-500" />
@@ -498,7 +572,6 @@ const MyListingsPage = () => {
                                             <Input placeholder="City, State" />
                                         </TextField>
 
-                                        {/* Adoption Fee */}
                                         <TextField defaultValue={selectedPet?.fee} name="fee" type="number">
                                             <Label className="flex items-center gap-1">
                                                 <DollarSign size={14} className="text-teal-500" />
@@ -507,7 +580,6 @@ const MyListingsPage = () => {
                                             <Input placeholder="Enter adoption fee" startContent="$" />
                                         </TextField>
 
-                                        {/* Description */}
                                         <div className="md:col-span-2">
                                             <TextField defaultValue={selectedPet?.description} name="description">
                                                 <Label className="flex items-center gap-1">
@@ -542,7 +614,6 @@ const MyListingsPage = () => {
             {isRequestsModalOpen && selectedPet && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[85vh] flex flex-col">
-                        {/* Header - White/Clean */}
                         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                             <div className="flex justify-between items-center">
                                 <div>
@@ -562,7 +633,6 @@ const MyListingsPage = () => {
                             </div>
                         </div>
 
-                        {/* Content */}
                         <div className="flex-1 overflow-y-auto p-6">
                             {adoptions.length === 0 ? (
                                 <div className="text-center py-8">
@@ -571,7 +641,7 @@ const MyListingsPage = () => {
                             ) : (
                                 <div className="space-y-4">
                                     {adoptions.map((adoption) => (
-                                        <div key={adoption.id} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                                        <div key={adoption._id} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                                             <div className="flex justify-between items-start mb-3">
                                                 <div className="flex-1">
                                                     <div className="flex items-center gap-2 mb-1">
@@ -617,7 +687,7 @@ const MyListingsPage = () => {
                                                     <Button
                                                         size="sm"
                                                         variant="light"
-                                                        onPress={() => console.log("View user:", request.userId)}
+                                                        onPress={() => console.log("View user:", adoption.userId)}
                                                         startContent={<User size={12} />}
                                                         className="text-blue-600 dark:text-blue-400"
                                                     >
@@ -653,8 +723,6 @@ const MyListingsPage = () => {
                             )}
                         </div>
 
-
-                        {/* Footer - White/Clean */}
                         <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
                             <Button variant="outline" onPress={() => setIsRequestsModalOpen(false)} className="w-full">
                                 Close

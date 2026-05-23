@@ -47,7 +47,11 @@ export const getPetByOwner = async (id)=> {
     return pets;
 }
 
-
+export const geRequestsById = async(id)=>{
+    const res = await fetch(`${Api}/requests/${id}`);
+    const requests = await res.json();
+    return requests;
+}
 
 // export const getUserByEmail = async (email) => {
 //   const res = await fetch(`${Api}/users?email=${email}`);

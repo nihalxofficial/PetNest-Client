@@ -45,10 +45,15 @@ const ListPetCard = ({pet}) => {
                                 <MapPin size={14} className="text-teal-500" />
                                 {pet.location}
                             </div>
-                            {pet.vaccinated && (
+                            {pet.vaccinated ? (
                                 <div className="flex items-center gap-1.5 text-sm text-green-600">
                                     <Syringe size={14} />
                                     Vaccinated
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-1.5 text-sm text-red-500">
+                                    <Syringe size={14} />
+                                    Not Vaccinated
                                 </div>
                             )}
                         </div>
