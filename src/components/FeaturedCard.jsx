@@ -88,28 +88,28 @@ const FeaturedCard = ({ styles, pet, index }) => {
                     {/* Button Group */}
                     <div className="flex gap-2 mt-auto">
                         {/* View Details Button */}
-                        <Link href={`/all-pets/${pet._id}`} className="flex-1">
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className={`w-full cursor-pointer flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 border ${styles.buttonColor} text-gray-700 dark:text-gray-300`}
-                            >
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={`w-full cursor-pointer  px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 border ${styles.buttonColor} text-gray-700 dark:text-gray-300`}
+                        >
+                            <Link href={`/all-pets/${pet._id}`} className="flex-1 flex items-center justify-center gap-2">
                                 <Eye size={16} />
                                 View Details
-                            </motion.button>
-                        </Link>
+                            </Link>
+                        </motion.button>
 
                         {/* Adopt Now Button */}
-                        <Link href={`/adopt/${pet._id}`} className="flex-1">
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="w-full cursor-pointer flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-white bg-linear-to-r from-teal-600 to-emerald-500 dark:from-teal-500 dark:to-emerald-400 shadow-md hover:shadow-lg transition-all duration-300"
-                            >
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="w-full cursor-pointer px-3 py-2.5 rounded-xl text-sm font-medium text-white bg-linear-to-r from-teal-600 to-emerald-500 dark:from-teal-500 dark:to-emerald-400 shadow-md hover:shadow-lg transition-all duration-300"
+                        >
+                            <Link href={`/all-pets/${pet._id}`} className="flex-1 flex items-center justify-center gap-2 ">
                                 <ShoppingBag size={16} />
                                 Adopt Now
-                            </motion.button>
-                        </Link>
+                            </Link>
+                        </motion.button>
                     </div>
                 </div>
             </div>
