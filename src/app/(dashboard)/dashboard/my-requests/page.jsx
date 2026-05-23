@@ -18,7 +18,7 @@ import {
     Heart,
 } from "lucide-react";
 import RequestTableRow from "@/components/RequestTableRow";
-import { geRequestsById, getPetById } from "@/lib/pets/data";
+import { geRequestsById } from "@/lib/pets/data";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
@@ -32,9 +32,11 @@ const MyRequestsPage = async () => {
     })
     const userId = session?.user?.id
 
-    const Requests = await geRequestsById(userId);
-    const pet = await getPetById()
+    const { token } = await auth.api.getToken({
+        headers: await headers(), 
+    });
 
+    const Requests = await geRequestsById(userId, token);
 
     // Pagination logic
     // const totalPages = Math.ceil(requests.length / rowsPerPage);

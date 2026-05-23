@@ -52,13 +52,14 @@ const MyListingsPage = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [petToDelete, setPetToDelete] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(true); // Loading state for listings
-    const [isRequestsLoading, setIsRequestsLoading] = useState(false); // Loading state for requests
+    const [isLoading, setIsLoading] = useState(true);
+    const [isRequestsLoading, setIsRequestsLoading] = useState(false);
 
     const [species, setSpecies] = useState("");
     const [gender, setGender] = useState("");
     const [healthStatus, setHealthStatus] = useState("");
     const [vaccination, setVaccination] = useState("not-vaccinated");
+    const [token, setToken] = useState(null); // ✅ token in state
 
     const { data: session } = authClient.useSession();
     const ownerID = session?.user?.id;
@@ -71,13 +72,22 @@ const MyListingsPage = () => {
     // eslint-disable-next-line react-hooks/refs
     selectedPetRef.current = selectedPet;
 
+    // ─── Get JWT token once on mount ─────────────────────────────────────────
+    useEffect(() => {
+        const getToken = async () => {
+            const { data: jwtData } = await authClient.token();
+            setToken(jwtData?.token);
+        };
+        getToken();
+    }, []);
+
     // ─── Initial data fetch ───────────────────────────────────────────────────
     useEffect(() => {
-        if (!ownerID) return;
+        if (!ownerID || !token) return;
         const fetchListings = async () => {
             setIsLoading(true);
             try {
-                const listingsData = await getPetByOwner(ownerID);
+                const listingsData = await getPetByOwner(ownerID, token);
                 setListings(listingsData);
             } catch (error) {
                 console.error(error);
@@ -86,21 +96,22 @@ const MyListingsPage = () => {
             }
         };
         fetchListings();
-    }, [ownerID]);
+    }, [ownerID, token]);
 
     // ─── Fetch adoptions whenever selectedPet changes ─────────────────────────
     const fetchAdoptions = useCallback(async (petId) => {
-        if (!petId) return;
+        if (!petId || !token) return;
         setIsRequestsLoading(true);
         try {
-            const adoptionData = await getAdoptionByPet(petId);
-            setAdoptions(adoptionData);
+            const adoptionData = await getAdoptionByPet(petId, token);
+            setAdoptions(Array.isArray(adoptionData) ? adoptionData : []);
         } catch (error) {
             console.error(error);
+            setAdoptions([]);
         } finally {
             setIsRequestsLoading(false);
         }
-    }, []);
+    }, [token]);
 
     useEffect(() => {
         if (!selectedPet?._id) return;
@@ -114,13 +125,13 @@ const MyListingsPage = () => {
 
         const interval = setInterval(() => {
             const pet = selectedPetRef.current;
-            if (pet?._id) {
-                getAdoptionByPet(pet._id)
+            if (pet?._id && token) {
+                getAdoptionByPet(pet._id, token)
                     .then((fresh) => {
+                        const freshArray = Array.isArray(fresh) ? fresh : [];
                         setAdoptions((prev) => {
-                            // Only update if something actually changed (avoid unnecessary re-renders)
-                            if (JSON.stringify(fresh) !== JSON.stringify(prev)) {
-                                return fresh;
+                            if (JSON.stringify(freshArray) !== JSON.stringify(prev)) {
+                                return freshArray;
                             }
                             return prev;
                         });
@@ -130,7 +141,7 @@ const MyListingsPage = () => {
         }, POLL_INTERVAL);
 
         return () => clearInterval(interval);
-    }, [isRequestsModalOpen]);
+    }, [isRequestsModalOpen, token]);
 
     // ─── Stats ────────────────────────────────────────────────────────────────
     const totalListings = listings.length;
@@ -152,7 +163,6 @@ const MyListingsPage = () => {
             vaccination: vaccination === "vaccinated",
         };
 
-        // Optimistic update — reflect changes in the grid immediately
         setListings((prev) =>
             prev.map((pet) =>
                 pet._id === selectedPet._id ? { ...pet, ...updateData } : pet
@@ -165,18 +175,16 @@ const MyListingsPage = () => {
             const result = await updatePetData(selectedPet._id, updateData);
             if (result) {
                 toast.success("Data Updated!");
-                // Refresh listings from server to stay in sync
-                if (ownerID) {
-                    const fresh = await getPetByOwner(ownerID);
+                if (ownerID && token) {
+                    const fresh = await getPetByOwner(ownerID, token);
                     setListings(fresh);
                 }
             }
         } catch (err) {
             console.error(err);
             toast.error("Update failed. Please try again.");
-            // Rollback: re-fetch from server
-            if (ownerID) {
-                const fresh = await getPetByOwner(ownerID);
+            if (ownerID && token) {
+                const fresh = await getPetByOwner(ownerID, token);
                 setListings(fresh);
             }
         }
@@ -214,20 +222,17 @@ const MyListingsPage = () => {
 
     // ── Approve: optimistic update, then server call ──────────────────────────
     const handleApproveRequest = async (adoptionId) => {
-        // Immediately reflect "approved" in UI
         setAdoptions((prev) =>
             prev.map((a) => (a._id === adoptionId ? { ...a, status: "approved" } : a))
         );
         try {
             await approveAdoption(adoptionId);
-            // Optionally refresh listings so the pet's status badge updates too
-            if (ownerID) {
-                const fresh = await getPetByOwner(ownerID);
+            if (ownerID && token) {
+                const fresh = await getPetByOwner(ownerID, token);
                 setListings(fresh);
             }
         } catch (err) {
             toast.error("Failed to approve. Please try again.");
-            // Rollback
             setAdoptions((prev) =>
                 prev.map((a) => (a._id === adoptionId ? { ...a, status: "pending" } : a))
             );
@@ -236,7 +241,6 @@ const MyListingsPage = () => {
 
     // ── Reject: optimistic update, then server call ───────────────────────────
     const handleRejectRequest = async (adoptionId) => {
-        // Immediately reflect "rejected" in UI
         setAdoptions((prev) =>
             prev.map((a) => (a._id === adoptionId ? { ...a, status: "rejected" } : a))
         );
@@ -245,7 +249,6 @@ const MyListingsPage = () => {
         } catch (err) {
             console.error(err);
             toast.error("Failed to reject. Please try again.");
-            // Rollback
             setAdoptions((prev) =>
                 prev.map((a) => (a._id === adoptionId ? { ...a, status: "pending" } : a))
             );
@@ -336,7 +339,6 @@ const MyListingsPage = () => {
             {/* Listings Grid with Skeleton Loader */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {isLoading ? (
-                    // Show skeleton loaders while loading
                     <>
                         <ListingSkeleton />
                         <ListingSkeleton />
@@ -438,7 +440,7 @@ const MyListingsPage = () => {
                 )}
             </div>
 
-            {/* Empty State - Only show when not loading and no listings */}
+            {/* Empty State */}
             {!isLoading && listings.length === 0 && (
                 <div className="text-center py-16">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
@@ -656,11 +658,8 @@ const MyListingsPage = () => {
 
                         <div className="flex-1 overflow-y-auto p-6">
                             {isRequestsLoading ? (
-                                // Show skeleton loaders while loading requests
                                 <>
                                     <RequestSkeleton />
-                                    {/* <RequestSkeleton /> */}
-                                    {/* <RequestSkeleton /> */}
                                 </>
                             ) : adoptions.length === 0 ? (
                                 <div className="text-center py-8">

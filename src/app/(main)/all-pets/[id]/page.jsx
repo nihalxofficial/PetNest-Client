@@ -33,7 +33,6 @@ import OwnerRightContainer from "@/components/OwnerRightContainer";
 import { getPetById, getUserById } from "@/lib/pets/data";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { PetDetailsPageSkeleton } from "@/components/PetDetailsPageSkeleton";
 
 const PetDetailsPage = async ({ params }) => {
     const { id } = await params
@@ -50,7 +49,7 @@ const PetDetailsPage = async ({ params }) => {
     const user = session?.user;
 
     const ownerID = petData?.ownerID;
-    const owner = await getUserById(ownerID);
+    const owner = await getUserById(ownerID, token);
 
     const isOwner = user?.email === petData?.ownerEmail;
 
