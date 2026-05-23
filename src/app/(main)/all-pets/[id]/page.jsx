@@ -61,7 +61,7 @@ const PetDetailsPage = async ({ params }) => {
                                 Pet Not Found
                             </h1>
                             <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-                                We couldn't find the pet you're looking for. It may have been removed, adopted, or the link might be incorrect.
+                                We couldn&apos;t find the pet you&apos;re looking for. It may have been removed, adopted, or the link might be incorrect.
                             </p>
 
                             <div className="border-t border-gray-200 dark:border-gray-700 my-6" />
@@ -91,7 +91,7 @@ const PetDetailsPage = async ({ params }) => {
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <Link
                                     href="/all-pets"
-                                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                                 >
                                     <PawPrint size={16} />
                                     Browse All Pets
@@ -310,10 +310,9 @@ const PetDetailsPage = async ({ params }) => {
                                     <p className="text-gray-500 dark:text-gray-400 mb-4">
                                         {petData.name} has found their forever home.
                                     </p>
-                                    {/* Link styled as button — no as={Link} needed */}
                                     <Link
                                         href="/all-pets"
-                                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-semibold hover:shadow-lg transition-all duration-300"
+                                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold hover:shadow-lg transition-all duration-300"
                                     >
                                         <PawPrint size={16} />
                                         Browse Other Pets

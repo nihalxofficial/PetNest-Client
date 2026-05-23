@@ -8,7 +8,7 @@
 
 ### *Find your perfect companion. Give them a forever home.*
 
-A full-stack Pet Adoption Platform where users can explore pets, submit adoption requests, and manage listings — all with secure authentication and a beautiful responsive UI.
+A full-stack Pet Adoption Platform where users can explore pets, submit adoption requests and manage listings — all with secure authentication and a beautiful responsive UI.
 
 [🌐 Live Site](https://petnest-olive.vercel.app/) · [🖥️ Server](https://petnest-server-sepia.vercel.app/) · [📁 Client Repo](https://github.com/nihalxofficial/PetNest-Client) · [📁 Server Repo](https://github.com/nihalxofficial/PetNest-Server)
 
@@ -18,17 +18,17 @@ A full-stack Pet Adoption Platform where users can explore pets, submit adoption
 
 ## 📌 Purpose
 
-PetNest is a real-world pet adoption portal that connects animal lovers with shelters and individual pet owners. Users can browse available pets, view detailed profiles, and submit adoption requests. Pet owners/shelters can manage their listings and handle incoming adoption requests — all within a clean, secure, and responsive interface.
+PetNest is a real-world pet adoption portal that connects animal lovers with shelters and individual pet owners. Users can browse available pets, view detailed profiles and submit adoption requests. Pet owners/shelters can manage their listings and handle incoming adoption requests — all within a clean, secure and responsive interface.
 
 ---
 
 ## ✨ Features
 
-- 🐶 **Browse & Search Pets** — Explore all available pets with search by name, filter by species, and sorted listings using MongoDB `$regex` and `$in` operators
+- 🐶 **Browse & Search Pets** — Explore all available pets with search by name, filter by species and sorted listings using MongoDB `$regex` and `$in` operators
 - 🔐 **Secure Authentication** — Email/password and Google OAuth login powered by Better Auth with JWT stored in HTTPOnly cookies
 - 📋 **Adoption Request System** — Authenticated users can submit adoption requests with pickup dates; only one request per pet can be approved
 - 🏠 **Owner Dashboard** — Pet owners can add, edit, delete listings and approve or reject incoming adoption requests
-- 📱 **Fully Responsive Design** — Mobile, tablet, and desktop layouts with Dark/Light theme toggle
+- 📱 **Fully Responsive Design** — Mobile, tablet and desktop layouts with Dark/Light theme toggle
 - 🔒 **Protected Routes** — Private routes stay accessible on reload; logged-in users are never unexpectedly redirected to login
 - ✅ **Adoption Control** — Pet owners cannot adopt their own pets; once a request is approved the pet is marked as adopted and no further requests are accepted
 - 🎞️ **Smooth Animations** — Framer Motion transitions throughout the app for a polished experience
@@ -62,77 +62,169 @@ PetNest is a real-world pet adoption portal that connects animal lovers with she
 
 ---
 
+## 🗂️ How PetNest Works — Core User Flows
+
+### 🐾 For Adopters
+
+1. **Register / Login** — Sign up with email & password or continue with Google OAuth.
+2. **Browse Pets** — Visit the All Pets page to search by name or filter by species. Each card shows key info at a glance.
+3. **View Pet Profile** — Click any pet to see their full profile: photos, description, age, species and owner details.
+4. **Submit Adoption Request** — Authenticated users can fill in a short form including their preferred pickup date and submit a request.
+5. **Track Requests** — The "My Requests" dashboard shows all submitted requests along with their current status (Pending / Approved / Rejected).
+
+### 🏠 For Pet Owners / Shelters
+
+1. **Add a Listing** — Use the "Add Pet" form to create a new listing with photos, name, species, age and description.
+2. **Manage Listings** — Edit or delete any of your active listings from the "My Listings" dashboard.
+3. **Handle Requests** — View incoming adoption requests per pet and approve or reject them individually.
+4. **Adoption Lock** — Once a request is approved, the pet is automatically marked as adopted and further requests are disabled.
+
+### 🔐 Authentication & Authorization
+
+- Better Auth handles the full auth lifecycle (sign up, sign in, session management, Google OAuth).
+- On login, the server issues a JWT stored in an HTTPOnly cookie — invisible to JavaScript, resistant to XSS attacks.
+- Every protected API route verifies the cookie before processing the request.
+- Pet owners cannot submit adoption requests for their own pets (enforced on both client and server).
+
+---
+
 ## 🔐 JWT Authentication Flow
 
 ### How It Works — End to End
 
 ```
-User Login → Server generates JWT → Stored in HTTPOnly Cookie → Sent automatically on every request → Express middleware verifies token → Private route access granted
+User Login (Better Auth) → authClient.token() / auth.api.getToken() → JWT from Better Auth → Sent in Authorization header to Express → Middleware verifies token → Private route access granted
 ```
 
-### 1. Frontend — Requesting & Storing the Token
+### Setting Up Better Auth
 
-After a successful login (via Better Auth), the client calls the backend to generate a session token:
+Better Auth must be configured on both the client and server sides before token retrieval works. PetNest uses the **`jwt()` plugin** (backed by [`jose-cjs`](https://www.npmjs.com/package/jose-cjs)) which handles signing and verifying JWTs natively within Better Auth — no manual `jwt.sign()` call needed.
 
-```js
-// lib/auth.js (client-side)
-export const getJwtToken = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/auth/jwt`, {
-    method: 'POST',
-    credentials: 'include', // ← sends & receives cookies automatically
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: session.user.email }),
-  });
-  return res.json();
-};
+Install the peer dependency first:
+
+```bash
+npm install jose-cjs
 ```
 
-The server responds by setting an **HTTPOnly cookie** — JavaScript on the client cannot read or steal it, making it XSS-resistant.
+#### Server-side Auth Setup (`lib/auth.ts`)
 
-```js
-// Calling the token function after login succeeds
-useEffect(() => {
-  if (session?.user) {
-    getJwtToken(); // triggers the cookie to be set server-side
-  }
-}, [session]);
-```
+```ts
+import { betterAuth } from "better-auth";
+import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { jwt } from "better-auth/plugins";  // ← jwt plugin
+import clientPromise from "./mongodb";
 
-### 2. Backend — Generating & Setting the Token
-
-```js
-// routes/auth.js
-const jwt = require('jsonwebtoken');
-
-router.post('/auth/jwt', async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ message: 'Email required' });
-
-  const token = jwt.sign(
-    { email },                         // payload
-    process.env.JWT_SECRET,            // secret from .env
-    { expiresIn: '7d' }                // expiry
-  );
-
-  res
-    .cookie('petnest_token', token, {
-      httpOnly: true,                  // ← not accessible via JS
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',                // required for cross-origin (Vercel → Render)
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in ms
-    })
-    .json({ success: true });
+export const auth = betterAuth({
+  database: mongodbAdapter(await clientPromise.then(c => c.db())),
+  plugins: [jwt()], // ← required for auth.api.getToken() to work
+  emailAndPassword: { enabled: true },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+  },
+  trustedOrigins: [process.env.CLIENT_URL!],
 });
 ```
 
+> ⚠️ The `jwt()` plugin is **required** on the server. It uses `jose-cjs` under the hood to sign tokens. Without it, `auth.api.getToken()` will return `null`.
+
+#### Client-side Auth Setup (`lib/auth-client.ts`)
+
+```ts
+import { createAuthClient } from "better-auth/react";
+import { jwtClient } from "better-auth/client/plugins"; // ← jwtClient, not bearerClient
+
+export const authClient = createAuthClient({
+  baseURL: process.env.NEXT_PUBLIC_SERVER_URL!,
+  plugins: [jwtClient()], // ← required for authClient.token() to work
+});
+```
+
+> ⚠️ The `jwtClient()` plugin is **required** on the client. Without it, `authClient.token()` will return `null` or fail silently. It must match the `jwt()` plugin used on the server.
+
+---
+
+### 1. Getting the Token — Client Side (React Component)
+
+In client components, use `authClient.token()` to retrieve the JWT. Store it in state so it's available for authenticated API calls:
+
+```js
+import { useState, useEffect } from "react";
+import { authClient } from "@/lib/auth-client";
+
+export default function SomeProtectedComponent() {
+  const [token, setToken] = useState(null);
+
+  // ─── Get JWT token once on mount ─────────────────────────────────────────
+  useEffect(() => {
+    const getToken = async () => {
+      const { data: jwtData } = await authClient.token();
+      const token = jwtData?.token;
+      setToken(jwtData?.token);
+    };
+    getToken();
+  }, []);
+
+  // Use token in your API calls
+  const fetchProtectedData = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/pets`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.json();
+  };
+
+  // ...
+}
+```
+
+---
+
+### 2. Getting the Token — Server Side (Next.js Server Component / Route Handler)
+
+In server components or API route handlers, use `auth.api.getToken()` with the incoming request headers:
+
+```ts
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
+export async function GET() {
+  const { token } = await auth.api.getToken({
+    headers: await headers(), //   passes cookies/auth headers from the request
+  });
+
+  if (!token) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  // Use token to call your Express backend
+  const res = await fetch(`${process.env.SERVER_URL}/pets`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  return Response.json(data);
+}
+```
+
+---
+
 ### 3. Backend — Verifying the Token (Middleware)
+
+The Express backend verifies the JWT from the `Authorization` header on every protected route:
 
 ```js
 // middleware/verifyToken.js
 const jwt = require('jsonwebtoken');
 
 const verifyToken = (req, res, next) => {
-  const token = req.cookies?.petnest_token;
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
 
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized: No token found' });
@@ -149,6 +241,8 @@ const verifyToken = (req, res, next) => {
 
 module.exports = verifyToken;
 ```
+
+---
 
 ### 4. Protecting Private Routes
 
@@ -170,19 +264,13 @@ router.post('/adoptions', verifyToken, async (req, res) => {
 });
 ```
 
-### 5. Logout — Clearing the Cookie
+### 5. Logout — Clearing the Session
+
+Better Auth handles session destruction on logout. Call `authClient.signOut()` on the client:
 
 ```js
-// routes/auth.js
-router.post('/auth/logout', (req, res) => {
-  res
-    .clearCookie('petnest_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
-    })
-    .json({ success: true });
-});
+await authClient.signOut();
+// Redirect to home or login page
 ```
 
 ---
@@ -202,12 +290,13 @@ PetNest-Client/
 │   │   └── my-listings/
 │   └── login/ register/
 ├── components/
-├── lib/                     # Auth helpers, API utils
+├── lib/
+│   ├── auth.ts              # Better Auth server config (with bearer plugin)
+│   └── auth-client.ts       # Better Auth client config (with bearerClient plugin)
 └── public/
 
 PetNest-Server/
 ├── routes/
-│   ├── auth.js              # JWT generation & logout
 │   ├── pets.js              # CRUD for pets
 │   └── adoptions.js         # Adoption request logic
 ├── middleware/
@@ -276,7 +365,7 @@ npm run dev   # starts on :3000
 `next` · `react` · `tailwindcss` · `@heroui/react` · `framer-motion` · `react-icons` · `lucide-react` · `@gravity-ui/icons` · `react-hot-toast` · `react-fast-marquee` · `better-auth`
 
 ### Server
-`express` · `mongoose` · `jsonwebtoken` · `cookie-parser` · `cors` · `dotenv` · `better-auth`
+`express` · `mongoose` · `jsonwebtoken` · `cookie-parser` · `cors` · `dotenv` · `better-auth` · `jose-cjs`
 
 ---
 
