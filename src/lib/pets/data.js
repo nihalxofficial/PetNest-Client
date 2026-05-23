@@ -23,8 +23,12 @@ export const getFeaturedPets = async ()=>{
     return pets;
 }
 
-export const getPetById = async (id)=> {
-    const res = await fetch(`${Api}/pets/${id}`);
+export const getPetById = async (id, token)=> {
+    const res = await fetch(`${Api}/pets/${id}`,{
+        headers: {
+            authorization : `Bearer ${token}` || ""
+        }
+    });
     const pet = await res.json();
     return pet;
 }

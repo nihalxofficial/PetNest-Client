@@ -38,7 +38,11 @@ import { PetDetailsPageSkeleton } from "@/components/PetDetailsPageSkeleton";
 const PetDetailsPage = async ({ params }) => {
     const { id } = await params
 
-    const petData = await getPetById(id);
+    const {token} = await auth.api.getToken({
+        headers: await headers(),
+      });
+      
+    const petData = await getPetById(id, token);
 
     const session = await auth.api.getSession({
         headers: await headers()
