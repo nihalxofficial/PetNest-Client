@@ -2,6 +2,8 @@ import { Calendar, Eye, Heart, MapPin, ShoppingBag, Syringe, VenetianMask } from
 import Image from 'next/image';
 import React from 'react';
 import Link from "next/link";
+import { Chip } from '@heroui/react';
+import { CircleCheckFill, HeartFill } from '@gravity-ui/icons';
 
 
 const ListPetCard = ({pet}) => {
@@ -11,13 +13,30 @@ const ListPetCard = ({pet}) => {
         >
             <div className="p-4">
                 <div className="flex flex-col sm:flex-row gap-4">
-                    <Image
-                        height={500}
-                        width={500}
-                        src={pet.image}
-                        alt={pet.name}
-                        className="w-full sm:w-32 h-32 object-cover rounded-xl"
-                    />
+                    <div className="relative">
+                        <Image
+                            height={500}
+                            width={500}
+                            src={pet.image}
+                            alt={pet.name}
+                            className="w-full sm:w-32 h-32 object-cover rounded-xl"
+                        />
+                        {/* Status Chip - Top Right of Image */}
+                        <div className="absolute top-1.5 right-1.5">
+                            {pet.status === "available" && (
+                                <Chip color="success">
+                                    <CircleCheckFill width={12} />
+                                    <Chip.Label>Available</Chip.Label>
+                                </Chip>
+                            )}
+                            {pet.status === "adopted" && (
+                                <Chip color="danger">
+                                    <HeartFill size={12} />
+                                    <Chip.Label>Adopted</Chip.Label>
+                                </Chip>
+                            )}
+                        </div>
+                    </div>
 
                     <div className="flex-1">
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">

@@ -2,6 +2,10 @@ import { Calendar, Eye, Heart, MapPin, ShoppingBag, Syringe, VenetianMask } from
 import Image from 'next/image';
 import React from 'react';
 import Link from "next/link";
+import { HeartFill } from '@gravity-ui/icons';
+import { Chip } from '@heroui/react';
+import { CircleCheckFill } from '@gravity-ui/icons';
+import { Clock } from 'lucide-react';
 
 const GridPetCard = ({ pet }) => {
     return (
@@ -20,6 +24,22 @@ const GridPetCard = ({ pet }) => {
                 <button className="absolute top-2 left-2 p-1.5 bg-white/80 dark:bg-gray-800/80 rounded-full hover:scale-110 transition">
                     <Heart size={16} className="text-gray-600 dark:text-gray-400 hover:text-red-500" />
                 </button>
+
+                {/* Status Chip - Top Right */}
+                <div className="absolute top-2 right-2">
+                    {pet.status === "available" && (
+                        <Chip color="success">
+                            <CircleCheckFill width={12} />
+                            <Chip.Label>Available</Chip.Label>
+                        </Chip>
+                    )}
+                    {pet.status === "adopted" && (
+                        <Chip color="danger">
+                            <HeartFill width={12} />
+                            <Chip.Label>Adopted</Chip.Label>
+                        </Chip>
+                    )}
+                </div>
             </div>
 
             <div className="p-4">
