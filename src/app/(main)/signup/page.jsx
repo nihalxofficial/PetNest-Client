@@ -112,14 +112,19 @@ const SignUpPage = () => {
             image,
             location,
         });
-        if(data){
+        if (data) {
             toast.success("SignUp Successful! 🎉")
             router.push("/")
         }
-        if(error){
+        if (error) {
             console.log(error);
             toast.error(error.message)
         }
+    }
+    const handleGoogleLogin = async () => {
+        const data = await authClient.signIn.social({
+            provider: "google",
+        });
     }
 
     // Real-time error clearing when user types
@@ -475,6 +480,7 @@ const SignUpPage = () => {
 
                         <div className="space-y-3">
                             <Button
+                                onClick={handleGoogleLogin}
                                 variant="outline"
                                 size="lg"
                                 className="w-full flex items-center justify-center gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300"
