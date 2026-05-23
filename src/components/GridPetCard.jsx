@@ -3,9 +3,9 @@ import Image from 'next/image';
 import React from 'react';
 import Link from "next/link";
 
-const GridPetCard = ({pet}) => {
+const GridPetCard = ({ pet }) => {
     return (
-        <div 
+        <div
             className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-gray-700/50 hover:shadow-xl transition-all duration-300 overflow-hidden group"
         >
             {/* Pet Image */}
@@ -81,18 +81,18 @@ const GridPetCard = ({pet}) => {
 
                 {/* Two Buttons */}
                 <div className="flex gap-2">
-                    <Link href={`/all-pets/${pet._id}`} className="flex-1">
-                        <button className="w-full cursor-pointer flex items-center justify-center gap-2 py-2 rounded-full border border-teal-500 text-teal-700 dark:border-teal-400 dark:text-teal-400 font-medium hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all duration-300 text-sm">
+                    <button className="w-full cursor-pointer  py-2 rounded-full border border-teal-500 text-teal-700 dark:border-teal-400 dark:text-teal-400 font-medium hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all duration-300 text-sm">
+                        <Link href={`/all-pets/${pet._id}`} className="flex-1 flex items-center justify-center gap-2">
                             <Eye size={14} />
                             View Details
-                        </button>
-                    </Link>
-                    <Link href={`/adopt/${pet._id}`} className="flex-1">
-                        <button className="w-full cursor-pointer flex items-center justify-center gap-2 py-2 rounded-full bg-linear-to-r from-teal-600 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300 text-sm">
+                        </Link>
+                    </button>
+                    <button className="w-full cursor-pointer flex items-center justify-center gap-2 py-2 rounded-full bg-linear-to-r from-teal-600 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300 text-sm">
+                        <Link href={`/all-pets/${pet._id}`} className="flex-1 flex items-center justify-center gap-2">
                             <ShoppingBag size={14} />
                             Adopt Now
-                        </button>
-                    </Link>
+                        </Link>
+                    </button>
                 </div>
             </div>
         </div>

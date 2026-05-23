@@ -26,9 +26,9 @@ export const updatePetData = async (id, data)=> {
         body: JSON.stringify(data)
     });
     const result = await res.json();
-    // if(result.modifiedCount>0){
-    //     revalidatePath(`${Api}/pets/${id}`)
-    // }
+    if(result.modifiedCount>0){
+        revalidatePath(`${Api}/pets/${id}`)
+    }
     return data;
 }
 
@@ -77,3 +77,15 @@ export const rejectAdoption = async(id)=>{
     }
     return data;
 }
+
+export const deleteAdoption = async(id)=>{
+    const res = await fetch(`${Api}/adoptions/${id}`,{
+        method: "DELETE"
+    })
+    const data = await res.json();
+    if(data.deletedCount>0){
+        revalidatePath(Api+"/dashboard/my-requests")
+    }
+    return data;
+}
+

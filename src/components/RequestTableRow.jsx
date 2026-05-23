@@ -4,6 +4,8 @@ import { Calendar, CheckCircle, Clock, Eye, Trash2, XCircle } from 'lucide-react
 import Image from 'next/image';
 import React from 'react';
 import Link from "next/link";
+import { deleteAdoption } from '@/lib/pets/action';
+import { toast } from 'react-toastify';
 
 
 // Status badge component with proper colors
@@ -34,8 +36,12 @@ const StatusBadge = ({ status }) => {
 
 const RequestTableRow = ({ request }) => {
 
-    const handleCancelRequest = (requestId) => {
-        console.log("Cancel request:", requestId);
+    const handleCancelRequest = async(id) => {
+        const result = await deleteAdoption(id);
+        if(result.deletedCount>0){
+            toast.warning("Cancelled Adoption Request!")
+        }
+        console.log(result);
     };
     return (
         <tr className="border-b border-gray-100 dark:border-gray-800 last:border-0">
@@ -102,7 +108,7 @@ const RequestTableRow = ({ request }) => {
                         <Button
                             size="sm"
                             variant="outline"
-                            onPress={() => handleCancelRequest(request.id)}
+                            onClick={() => handleCancelRequest(request._id)}
                             startContent={<Trash2 size={14} />}
                             className="border-red-500 text-red-600"
                         >

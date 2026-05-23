@@ -64,6 +64,7 @@ const MyListingsPage = () => {
 
     // Ref to track the currently open pet for polling without stale closure
     const selectedPetRef = useRef(null);
+    // eslint-disable-next-line react-hooks/refs
     selectedPetRef.current = selectedPet;
 
     // ─── Initial data fetch ───────────────────────────────────────────────────
@@ -93,6 +94,7 @@ const MyListingsPage = () => {
 
     useEffect(() => {
         if (!selectedPet?._id) return;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchAdoptions(selectedPet._id);
     }, [selectedPet?._id, fetchAdoptions]);
 
@@ -430,7 +432,7 @@ const MyListingsPage = () => {
                         You haven&apos;t added any pets for adoption yet.
                     </p>
                     <Link href="/dashboard/add-pet">
-                        <Button className="bg-gradient-to-r from-teal-600 to-emerald-500 text-white">
+                        <Button className="bg-linear-to-r from-teal-600 to-emerald-500 text-white">
                             Add Your First Pet
                         </Button>
                     </Link>
@@ -744,7 +746,7 @@ const MyListingsPage = () => {
                         </div>
                         <div className="p-6 pt-4">
                             <p className="text-gray-700 dark:text-gray-300">
-                                Are you sure you want to delete <span className="font-semibold">{petToDelete.name}</span>'s listing?
+                                Are you sure you want to delete <span className="font-semibold">{petToDelete.name}</span>&apos;s listing?
                             </p>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                                 This action cannot be undone. This pet listing will be permanently removed.
