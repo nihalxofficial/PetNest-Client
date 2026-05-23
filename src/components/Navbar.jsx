@@ -60,8 +60,10 @@ const PetNestNavbar = () => {
     const menuItems = [
         { name: "Home", href: "/", icon: Home },
         { name: "All Pets", href: "/all-pets", icon: PawPrint },
-        { name: "Add Pet", href: "/dashboard/add-pet", icon: Plus },
-        { name: "My Requests", href: "/dashboard/my-requests", icon: Heart },
+        ...(user ? [
+            { name: "Add Pet", href: "/dashboard/add-pet", icon: Plus },
+            { name: "My Requests", href: "/dashboard/my-requests", icon: Heart },
+        ] : []),
     ];
 
     const toggleTheme = () => {
@@ -124,20 +126,18 @@ const PetNestNavbar = () => {
                                 <Link
                                     key={index}
                                     href={item.href}
-                                    className={`group relative flex items-center gap-2 transition-all duration-300 font-medium ${
-                                        isActive
+                                    className={`group relative flex items-center gap-2 transition-all duration-300 font-medium ${isActive
                                             ? "text-teal-600 dark:text-teal-400"
                                             : "text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400"
-                                    }`}
+                                        }`}
                                 >
-                                    <Icon 
-                                        size={16} 
-                                        className={isActive ? "text-teal-600 dark:text-teal-400" : "text-teal-500"} 
+                                    <Icon
+                                        size={16}
+                                        className={isActive ? "text-teal-600 dark:text-teal-400" : "text-teal-500"}
                                     />
                                     {item.name}
-                                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-linear-to-r from-teal-500 to-emerald-500 transition-all duration-300 ${
-                                        isActive ? "w-full" : "w-0 group-hover:w-full"
-                                    }`} />
+                                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-linear-to-r from-teal-500 to-emerald-500 transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"
+                                        }`} />
                                 </Link>
                             );
                         })}
@@ -325,11 +325,10 @@ const PetNestNavbar = () => {
                                                 key={index}
                                                 href={item.href}
                                                 onClick={() => setIsMenuOpen(false)}
-                                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                                                    isActive
+                                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
                                                         ? "bg-linear-to-r from-teal-600 to-emerald-500 text-white"
                                                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                                                }`}
+                                                    }`}
                                             >
                                                 <Icon size={18} className={isActive ? "text-white" : "text-teal-500"} />
                                                 {item.name}
