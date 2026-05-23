@@ -28,10 +28,15 @@ const FeaturedCard = ({ styles, pet, index }) => {
                     />
 
                     {/* Vaccinated Badge */}
-                    {pet.vaccinated && (
+                    {pet.vaccinated ? (
                         <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-green-500/90 text-white text-xs font-semibold rounded-full backdrop-blur-sm">
                             <Syringe size={10} />
                             Vaccinated
+                        </div>
+                    ) : (
+                        <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-red-500/90 text-white text-xs font-semibold rounded-full backdrop-blur-sm">
+                            <Syringe size={10} />
+                            Not Vaccinated
                         </div>
                     )}
 
