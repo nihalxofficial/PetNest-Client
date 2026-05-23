@@ -1,3 +1,4 @@
+"use server"
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -27,6 +28,8 @@ import {
     Info,
     Clock,
     XCircle,
+    Frown,
+    Search,
 } from "lucide-react";
 import AdoptionForm from "@/components/AdoptionForm";
 import OwnerRightContainer from "@/components/OwnerRightContainer";
@@ -42,11 +45,120 @@ const PetDetailsPage = async ({ params }) => {
       });
       
     const petData = await getPetById(id, token);
+    console.log(petData);
 
     const session = await auth.api.getSession({
         headers: await headers()
     })
     const user = session?.user;
+
+    // Check if pet exists
+    if (petData.error) {
+        return (
+            <div className="min-h-screen bg-linear-to-br from-teal-50/50 via-white/30 to-emerald-50/50 dark:from-teal-950/30 dark:via-gray-900/50 dark:to-emerald-950/30 py-8 px-4 sm:px-6 lg:px-8">
+                <div className="container mx-auto max-w-4xl">
+                    {/* Back Button */}
+                    <Button
+                        variant="light"
+                        className="mb-6 text-teal-600 dark:text-teal-400"
+                    >
+                        <Link href="/all-pets" className="flex justify-between items-center gap-2">
+                            <PawPrint size={16} />
+                            Back to All Pets
+                        </Link>
+                    </Button>
+
+                    {/* Not Found Card */}
+                    <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 overflow-hidden">
+                        <div className="p-12 text-center">
+                            {/* Animated Icon */}
+                            <div className="relative w-32 h-32 mx-auto mb-6">
+                                <div className="absolute inset-0 rounded-full bg-amber-100 dark:bg-amber-900/30 animate-pulse" />
+                                <div className="absolute inset-2 rounded-full bg-amber-200 dark:bg-amber-900/50 flex items-center justify-center">
+                                    <Frown size={48} className="text-amber-600 dark:text-amber-400" />
+                                </div>
+                                <div className="absolute -top-2 -right-2">
+                                    <Search size={24} className="text-teal-500 animate-bounce" />
+                                </div>
+                            </div>
+
+                            {/* Title */}
+                            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
+                                Pet Not Found
+                            </h1>
+                            
+                            {/* Description */}
+                            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                                We couldn't find the pet you're looking for. It may have been removed, adopted, or the link might be incorrect.
+                            </p>
+
+                            {/* Divider */}
+                            <div className="border-t border-gray-200 dark:border-gray-700 my-6" />
+
+                            {/* Suggestions */}
+                            <div className="text-left max-w-md mx-auto mb-8">
+                                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                                    <Info size={14} className="text-teal-500" />
+                                    Here are some suggestions:
+                                </h3>
+                                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                                    <li className="flex items-center gap-2">
+                                        <CheckCircle size={12} className="text-teal-500" />
+                                        Check the URL for any typos
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <CheckCircle size={12} className="text-teal-500" />
+                                        Browse our available pets gallery
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <CheckCircle size={12} className="text-teal-500" />
+                                        Contact support if you need assistance
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                <Button
+                                    as={Link}
+                                    href="/all-pets"
+                                    className="bg-linear-to-r from-teal-600 to-emerald-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                                    startContent={<PawPrint size={16} />}
+                                >
+                                    Browse All Pets
+                                </Button>
+                                <Button
+                                    variant="bordered"
+                                    className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                                    startContent={<Heart size={16} />}
+                                >
+                                    Contact Support
+                                </Button>
+                            </div>
+
+                            {/* Quick Stats */}
+                            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div className="text-center">
+                                        <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">50+</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Available Pets</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">200+</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Happy Adoptions</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">24/7</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Support Available</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            </div>
+        );
+    }
 
     const ownerID = petData?.ownerID;
     const owner = await getUserById(ownerID, token);
