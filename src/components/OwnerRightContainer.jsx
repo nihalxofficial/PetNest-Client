@@ -1,4 +1,5 @@
 "use client"
+import { authClient } from '@/lib/auth-client';
 import { deletePetData, updatePetData } from '@/lib/pets/action';
 import { Button, Card, AlertDialog, TextField, Select, Input, Modal, Label, ListBox, TextArea, } from '@heroui/react';
 import { Edit, Trash2, User, Upload, FileText, DollarSign, MapPin, Syringe, Heart, PawPrint, VenetianMask, Calendar } from 'lucide-react';
@@ -24,14 +25,18 @@ const OwnerRightContainer = ({ petData }) => {
             healthStatus,
             vaccination: Boolean(vaccination),
         };
-        const result = await updatePetData(petData._id, updateData);
+        const { data: jwtData } = await authClient.token();
+	    const token = jwtData?.token;
+        const result = await updatePetData(petData._id, updateData, token);
         if(result.modifiedCount>0){
             toast.success("Data Updated!")
         }
     }
 
     const handleDelete = async() => {
-        const result = await deletePetData(petData._id);
+        const { data: jwtData } = await authClient.token();
+	    const token = jwtData?.token;
+        const result = await deletePetData(petData._id, token);
         if(result.deletedCount>0){
             toast.warning(`${petData.name} is deleted from listings`)
             router.push("/all-pets")

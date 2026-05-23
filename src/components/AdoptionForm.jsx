@@ -28,6 +28,7 @@ import { getLocalTimeZone, today } from "@internationalized/date";
 import { requestAdoption } from '@/lib/pets/action';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
+import { authClient } from '@/lib/auth-client';
 
 const AdoptionForm = ({ id, petData, user }) => {
     const [date, setDate] = useState(today(getLocalTimeZone()));
@@ -54,7 +55,9 @@ const AdoptionForm = ({ id, petData, user }) => {
         };
 
         try {
-            const data = await requestAdoption(id, modifiedData);
+            const { data: jwtData } = await authClient.token();
+	        const token = jwtData?.token;
+            const data = await requestAdoption(id, modifiedData,token);
             if (data.insertedId) {
                 toast.success(`Adoption request for ${petData.name} successful!`);
                 setSubmittedPetName(petData.name);

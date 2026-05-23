@@ -6,6 +6,7 @@ import React from 'react';
 import Link from "next/link";
 import { deleteAdoption } from '@/lib/pets/action';
 import { toast } from 'react-toastify';
+import { authClient } from '@/lib/auth-client';
 
 
 // Status badge component with proper colors
@@ -37,11 +38,12 @@ const StatusBadge = ({ status }) => {
 const RequestTableRow = ({ request }) => {
 
     const handleCancelRequest = async(id) => {
-        const result = await deleteAdoption(id);
+        const { data: jwtData } = await authClient.token();
+	    const token = jwtData?.token;
+        const result = await deleteAdoption(id, token);
         if(result.deletedCount>0){
             toast.warning("Cancelled Adoption Request!")
         }
-        console.log(result);
     };
     return (
         <tr className="border-b border-gray-100 dark:border-gray-800 last:border-0">

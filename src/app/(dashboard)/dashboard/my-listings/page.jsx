@@ -172,7 +172,7 @@ const MyListingsPage = () => {
         setIsEditModalOpen(false);
 
         try {
-            const result = await updatePetData(selectedPet._id, updateData);
+            const result = await updatePetData(selectedPet._id, updateData,token);
             if (result) {
                 toast.success("Data Updated!");
                 if (ownerID && token) {
@@ -191,7 +191,7 @@ const MyListingsPage = () => {
     };
 
     const handleDelete = async () => {
-        const result = await deletePetData(petToDelete._id);
+        const result = await deletePetData(petToDelete._id, token);
 
         if (result?.deletedCount > 0) {
             toast.warning(`${petToDelete.name} is deleted from listings`);
@@ -226,7 +226,7 @@ const MyListingsPage = () => {
             prev.map((a) => (a._id === adoptionId ? { ...a, status: "approved" } : a))
         );
         try {
-            await approveAdoption(adoptionId);
+            await approveAdoption(adoptionId, token);
             if (ownerID && token) {
                 const fresh = await getPetByOwner(ownerID, token);
                 setListings(fresh);
@@ -245,7 +245,7 @@ const MyListingsPage = () => {
             prev.map((a) => (a._id === adoptionId ? { ...a, status: "rejected" } : a))
         );
         try {
-            await rejectAdoption(adoptionId);
+            await rejectAdoption(adoptionId,token);
         } catch (err) {
             console.error(err);
             toast.error("Failed to reject. Please try again.");

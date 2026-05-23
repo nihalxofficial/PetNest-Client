@@ -58,7 +58,9 @@ const AddPetPage = () => {
             vaccination: Boolean(vaccination),
         };
 
-        const result = await addPetData(petData);
+        const { data: jwtData } = await authClient.token();
+        const token = jwtData?.token;
+        const result = await addPetData(petData, token);
         if (result.insertedId) {
             toast.success("New Pet Added!")
 

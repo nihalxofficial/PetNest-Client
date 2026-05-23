@@ -4,11 +4,12 @@ import { revalidatePath } from "next/cache";
 
 const Api = process.env.NEXT_PUBLIC_API;
 
-export const addPetData = async(data)=>{
+export const addPetData = async(data, token)=>{
     const res = await fetch(`${Api}/pets`, {
         method: "POST",
         headers: {
-            "Content-Type" : "application/json"
+            "Content-Type" : "application/json",
+            authorization: `Bearer ${token}` || "",
         },
         body: JSON.stringify(data)
     })
@@ -17,11 +18,12 @@ export const addPetData = async(data)=>{
 }
 
 
-export const updatePetData = async (id, data)=> {
+export const updatePetData = async (id, data, token)=> {
     const res = await fetch(`${Api}/pets/${id}`,{
         method: "PATCH",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}` || "",
         },
         body: JSON.stringify(data)
     });
@@ -32,19 +34,23 @@ export const updatePetData = async (id, data)=> {
     return data;
 }
 
-export const deletePetData = async(id)=>{
-    const res = await fetch(`${Api}/pets/${id}`,{
-        method: "DELETE"
-    })
-    const data = res.json();
+export const deletePetData = async (id, token) => {
+    const res = await fetch(`${Api}/pets/${id}`, {
+        method: "DELETE",
+        headers: {
+            authorization: `Bearer ${token}`,
+        },
+    });
+    const data = await res.json();
     return data;
 }
 
-export const requestAdoption = async(id, adoptionData)=> {
+export const requestAdoption = async(id, adoptionData,token)=> {
     const res = await fetch(`${Api}/adoptions/${id}`,{
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(adoptionData)
     })
@@ -56,9 +62,12 @@ export const requestAdoption = async(id, adoptionData)=> {
 }
 
 
-export const approveAdoption = async(id)=>{
+export const approveAdoption = async(id, token)=>{
     const res = await fetch(`${Api}/adoptions/approve/${id}`,{
-        method: "PATCH"
+        method: "PATCH",
+        headers: {
+            authorization: `Bearer ${token}`,
+        },
     })
     const data = await res.json();
     if(data.result.modifiedCount>0){
@@ -68,9 +77,12 @@ export const approveAdoption = async(id)=>{
     return data;
 }
 
-export const rejectAdoption = async(id)=>{
+export const rejectAdoption = async(id, token)=>{
     const res = await fetch(`${Api}/adoptions/reject/${id}`,{
-        method: "PATCH"
+        method: "PATCH",
+        headers: {
+            authorization: `Bearer ${token}`,
+        },
     })
     const data = await res.json();
     if(data.result.modifiedCount>0){
@@ -79,9 +91,12 @@ export const rejectAdoption = async(id)=>{
     return data;
 }
 
-export const deleteAdoption = async(id)=>{
+export const deleteAdoption = async(id, token)=>{
     const res = await fetch(`${Api}/adoptions/${id}`,{
-        method: "DELETE"
+        method: "DELETE",
+        headers: {
+            authorization: `Bearer ${token}`,
+        },
     })
     const data = await res.json();
     if(data.deletedCount>0){
