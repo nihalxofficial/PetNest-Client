@@ -8,13 +8,28 @@ export async function proxy(request) {
   });
 
   const user = session?.user;
-  if(user){
-    return NextResponse.next();
-  }else{
-      return NextResponse.redirect(new URL("/login", request.url));
+  const pathname = request.nextUrl.pathname;
+
+  // If logged in, redirect away from login/signup
+  if (user && (pathname === "/login" || pathname === "/signup")) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
+
+  // If not logged in, redirect away from protected routes
+  // if (!user && (pathname.startsWith("/dashboard") || pathname.startsWith("/all-pets/"))) {
+  //   return NextResponse.redirect(new URL("/login", request.url));
+  // }
+
+  // If not logged in, redirect to login with callbackUrl
+  if (!user && (pathname.startsWith("/dashboard") || pathname.match(/^\/all-pets\/.+/))) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+}
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/all-pets/:id", "/dashboard/:path*"],
+    matcher: ["/all-pets/:id+", "/dashboard/:path*", "/login", "/signup"],
 };

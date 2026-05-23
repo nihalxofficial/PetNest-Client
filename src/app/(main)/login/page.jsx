@@ -27,12 +27,14 @@ import bgImage from "@/assets/signup.jpg";
 import signupImage from "@/assets/welcome.png";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 
 const LoginPage = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/";
     const [isVisible, setIsVisible] = useState(false);
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -42,19 +44,22 @@ const LoginPage = () => {
 
         const { data, error } = await authClient.signIn.email({
             email,
-            password
+            password,
+            callbackURL: callbackUrl
         });
         if (data) {
             toast.success("SignIn Successful! 🎉");
-            router.push("/")
+            router.push(callbackUrl)
         }
         if (error) {
             toast.error(error.message)
+            return
         }
     }
     const handleGoogleLogin = async () => {
         const data = await authClient.signIn.social({
             provider: "google",
+            callbackURL: callbackUrl,
         });
     }
 
@@ -257,7 +262,7 @@ const LoginPage = () => {
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Don&apos;t have an account?{" "}
                                 <Link
-                                    href="/signup"
+                                    href={`/signup?callbackUrl=${callbackUrl}`}
                                     className="text-teal-600 dark:text-teal-400 font-semibold hover:underline"
                                 >
                                     Sign up

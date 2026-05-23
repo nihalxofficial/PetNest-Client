@@ -29,10 +29,12 @@ import signupImage from "@/assets/welcome.png"
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SignUpPage = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/";
     const [isVisible, setIsVisible] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false);
     const [password, setPassword] = useState("");
@@ -114,7 +116,7 @@ const SignUpPage = () => {
         });
         if (data) {
             toast.success("SignUp Successful! 🎉")
-            router.push("/")
+            router.push(callbackUrl)
         }
         if (error) {
             console.log(error);
@@ -124,6 +126,7 @@ const SignUpPage = () => {
     const handleGoogleLogin = async () => {
         const data = await authClient.signIn.social({
             provider: "google",
+            callbackURL: callbackUrl,
         });
     }
 
@@ -494,7 +497,7 @@ const SignUpPage = () => {
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Already have an account?{" "}
                                 <Link
-                                    href="/login"
+                                    href={`/login?callbackUrl=${callbackUrl}`}
                                     className="text-teal-600 dark:text-teal-400 font-semibold hover:underline"
                                 >
                                     Log in
