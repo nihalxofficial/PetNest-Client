@@ -63,6 +63,7 @@ export const approveAdoption = async(id)=>{
     const data = await res.json();
     if(data.result.modifiedCount>0){
         revalidatePath(Api+"/dashboard/my-listings")
+        revalidatePath(`${Api}/all-pets/${id}`)
     }
     return data;
 }

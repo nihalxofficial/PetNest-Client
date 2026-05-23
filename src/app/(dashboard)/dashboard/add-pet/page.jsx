@@ -23,12 +23,12 @@ import {
     DollarSign,
     FileText,
     PlusCircle,
+    Mail,
 } from "lucide-react";
 import { addPetData } from "@/lib/pets/action";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { authClient } from "@/lib/auth-client";
-import { getUserByEmail } from "@/lib/pets/data";
 
 const AddPetPage = () => {
     const router = useRouter();
@@ -37,34 +37,34 @@ const AddPetPage = () => {
     const [healthStatus, setHealthStatus] = useState("");
     const [vaccination, setVaccination] = useState("");
 
-    const { data: session } = authClient.useSession() 
-        const ownerEmail = session?.user?.email;
-        const ownerID = session?.user?.id;
+    const { data: session } = authClient.useSession()
+    const ownerEmail = session?.user?.email;
+    const ownerID = session?.user?.id;
+    const ownerName = session?.user?.name;
 
     const onSubmit = async (e) => {
-            e.preventDefault();
+        e.preventDefault();
 
-            const formData = new FormData(e.currentTarget);
-            const data = Object.fromEntries(formData.entries());
-            const petData = {
-                ownerID,
-                ownerEmail,
-                ...data,
-                fee: Number(data.fee),
-                species,
-                gender,
-                healthStatus,
-                status: "available",
-                vaccination: Boolean(vaccination),
-            };
+        const formData = new FormData(e.currentTarget);
+        const data = Object.fromEntries(formData.entries());
+        const petData = {
+            ownerID,
+            ...data,
+            fee: Number(data.fee),
+            species,
+            gender,
+            healthStatus,
+            status: "available",
+            vaccination: Boolean(vaccination),
+        };
 
-            const result = await addPetData(petData);
-            if(result.insertedId){
-                toast.success("New Pet Added!")
-                
-                router.push("/dashboard/my-listings")
-            }
+        const result = await addPetData(petData);
+        if (result.insertedId) {
+            toast.success("New Pet Added!")
+
+            router.push("/dashboard/my-listings")
         }
+    }
 
     return (
         <div className="max-w-5xl mx-auto">
@@ -88,29 +88,47 @@ const AddPetPage = () => {
                 <div className="p-6">
                     <form onSubmit={onSubmit} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Pet Name */}
-                            <TextField name="name">
+                            {/* Owner Name - NEW */}
+                            <TextField isReadOnly value={ownerName} name="ownerName">
                                 <Label className="flex items-center gap-1">
                                     <User size={14} className="text-teal-500" />
-                                    Pet Name <span className="text-red-500">*</span>
+                                    Owner Name
+                                </Label>
+                                <Input placeholder="Enter your full name" />
+                            </TextField>
+
+                            {/* Owner Email - NEW */}
+                            <TextField isReadOnly value={ownerEmail} type="email" name="ownerEmail">
+                                <Label className="flex items-center gap-1">
+                                    <Mail size={14} className="text-teal-500" />
+                                    Owner Email
+                                </Label>
+                                <Input  placeholder="Enter your email address" />
+                            </TextField>
+
+                            {/* Pet Name */}
+                            <TextField isRequired name="name">
+                                <Label className="flex items-center gap-1">
+                                    <User size={14} className="text-teal-500" />
+                                    Pet Name
                                 </Label>
                                 <Input placeholder="Enter pet name" />
                             </TextField>
 
                             {/* Age */}
-                            <TextField name="age">
+                            <TextField isRequired name="age">
                                 <Label className="flex items-center gap-1">
                                     <Calendar size={14} className="text-teal-500" />
-                                    Age <span className="text-red-500">*</span>
+                                    Age
                                 </Label>
                                 <Input placeholder="e.g., 2 years, 6 months" />
                             </TextField>
 
                             {/* Species */}
-                            <Select value={species} onChange={setSpecies} className="w-full" placeholder="Select Species">
+                            <Select isRequired value={species} onChange={setSpecies} className="w-full" placeholder="Select Species">
                                 <Label className="flex items-center gap-1">
                                     <PawPrint size={14} className="text-teal-500" />
-                                    Species <span className="text-red-500">*</span>
+                                    Species
                                 </Label>
                                 <Select.Trigger>
                                     <Select.Value />
@@ -127,10 +145,10 @@ const AddPetPage = () => {
                             </Select>
 
                             {/* Gender */}
-                            <Select value={gender} onChange={setGender} className="w-full" placeholder="Select Gender">
+                            <Select isRequired value={gender} onChange={setGender} className="w-full" placeholder="Select Gender">
                                 <Label className="flex items-center gap-1">
                                     <VenetianMask size={14} className="text-teal-500" />
-                                    Gender <span className="text-red-500">*</span>
+                                    Gender
                                 </Label>
                                 <Select.Trigger>
                                     <Select.Value />
@@ -145,7 +163,7 @@ const AddPetPage = () => {
                             </Select>
 
                             {/* Breed */}
-                            <TextField name="breed">
+                            <TextField isRequired name="breed">
                                 <Label className="flex items-center gap-1">
                                     <PawPrint size={14} className="text-teal-500" />
                                     Breed
@@ -154,19 +172,19 @@ const AddPetPage = () => {
                             </TextField>
 
                             {/* Image URL */}
-                            <TextField type="url" name="image">
+                            <TextField isRequired type="url" name="image">
                                 <Label className="flex items-center gap-1">
                                     <Upload size={14} className="text-teal-500" />
                                     Image URL
                                 </Label>
-                                <Input 
-                                    placeholder="https://example.com/pet-image.jpg" 
+                                <Input
+                                    placeholder="https://example.com/pet-image.jpg"
                                     startContent={<Upload size={16} className="text-gray-400" />}
                                 />
                             </TextField>
 
                             {/* Health Status */}
-                            <Select value={healthStatus} onChange={setHealthStatus} className="w-full" placeholder="Select Health Status">
+                            <Select isRequired value={healthStatus} onChange={setHealthStatus} className="w-full" placeholder="Select Health Status">
                                 <Label className="flex items-center gap-1">
                                     <Heart size={14} className="text-teal-500" />
                                     Health Status
@@ -186,7 +204,7 @@ const AddPetPage = () => {
                             </Select>
 
                             {/* Vaccination Status */}
-                            <Select value={vaccination} onChange={setVaccination} className="w-full" placeholder="Select Vaccination Status">
+                            <Select isRequired value={vaccination} onChange={setVaccination} className="w-full" placeholder="Select Vaccination Status">
                                 <Label className="flex items-center gap-1">
                                     <Syringe size={14} className="text-teal-500" />
                                     Vaccination Status
@@ -204,19 +222,19 @@ const AddPetPage = () => {
                             </Select>
 
                             {/* Location */}
-                            <TextField name="location">
+                            <TextField isRequired name="location">
                                 <Label className="flex items-center gap-1">
                                     <MapPin size={14} className="text-teal-500" />
-                                    Location <span className="text-red-500">*</span>
+                                    Location
                                 </Label>
                                 <Input placeholder="City, State" />
                             </TextField>
 
                             {/* Adoption Fee */}
-                            <TextField name="fee" type="number">
+                            <TextField isRequired name="fee" type="number">
                                 <Label className="flex items-center gap-1">
                                     <DollarSign size={14} className="text-teal-500" />
-                                    Adoption Fee ($) <span className="text-red-500">*</span>
+                                    Adoption Fee ($)
                                 </Label>
                                 <Input placeholder="Enter adoption fee" startContent="$" />
                             </TextField>

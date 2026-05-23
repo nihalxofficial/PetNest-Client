@@ -40,6 +40,8 @@ import { authClient } from "@/lib/auth-client";
 import { CircleCheckFill } from "@gravity-ui/icons";
 import { approveAdoption, deletePetData, rejectAdoption, updatePetData } from "@/lib/pets/action";
 import { toast } from "react-toastify";
+import { ListingSkeleton } from "@/components/ListingSkeleton";
+import { RequestSkeleton } from "@/components/RequestSkeleton";
 
 // Poll interval for new adoption requests (in ms)
 const POLL_INTERVAL = 15000;
@@ -50,6 +52,8 @@ const MyListingsPage = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [petToDelete, setPetToDelete] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // Loading state for listings
+    const [isRequestsLoading, setIsRequestsLoading] = useState(false); // Loading state for requests
 
     const [species, setSpecies] = useState("");
     const [gender, setGender] = useState("");
@@ -71,11 +75,14 @@ const MyListingsPage = () => {
     useEffect(() => {
         if (!ownerID) return;
         const fetchListings = async () => {
+            setIsLoading(true);
             try {
                 const listingsData = await getPetByOwner(ownerID);
                 setListings(listingsData);
             } catch (error) {
                 console.error(error);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchListings();
@@ -84,11 +91,14 @@ const MyListingsPage = () => {
     // ─── Fetch adoptions whenever selectedPet changes ─────────────────────────
     const fetchAdoptions = useCallback(async (petId) => {
         if (!petId) return;
+        setIsRequestsLoading(true);
         try {
             const adoptionData = await getAdoptionByPet(petId);
             setAdoptions(adoptionData);
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsRequestsLoading(false);
         }
     }, []);
 
@@ -139,7 +149,7 @@ const MyListingsPage = () => {
             species,
             gender,
             healthStatus,
-            vaccination: Boolean(vaccination),
+            vaccination: vaccination === "vaccinated",
         };
 
         // Optimistic update — reflect changes in the grid immediately
@@ -216,7 +226,6 @@ const MyListingsPage = () => {
                 setListings(fresh);
             }
         } catch (err) {
-            console.error(err);
             toast.error("Failed to approve. Please try again.");
             // Rollback
             setAdoptions((prev) =>
@@ -324,103 +333,113 @@ const MyListingsPage = () => {
                 </Card>
             </div>
 
-            {/* Listings Grid */}
+            {/* Listings Grid with Skeleton Loader */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {listings.map((pet) => (
-                    <Card key={pet._id} className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 overflow-hidden">
-                        <div className="flex flex-col sm:flex-row">
-                            {/* Pet Image */}
-                            <div className="relative w-full sm:w-40 h-40 sm:h-auto">
-                                <Image
-                                    src={pet.image}
-                                    alt={pet.name}
-                                    fill
-                                    className="object-cover"
-                                />
-                                <div className="absolute top-2 left-2">
-                                    <StatusChip status={pet.status} />
+                {isLoading ? (
+                    // Show skeleton loaders while loading
+                    <>
+                        <ListingSkeleton />
+                        <ListingSkeleton />
+                        <ListingSkeleton />
+                        <ListingSkeleton />
+                    </>
+                ) : (
+                    listings.map((pet) => (
+                        <Card key={pet._id} className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 overflow-hidden">
+                            <div className="flex flex-col sm:flex-row">
+                                {/* Pet Image */}
+                                <div className="relative w-full sm:w-40 h-40 sm:h-auto">
+                                    <Image
+                                        src={pet.image}
+                                        alt={pet.name}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                    <div className="absolute top-2 left-2">
+                                        <StatusChip status={pet.status} />
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Pet Info */}
-                            <div className="flex-1 p-4">
-                                <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                                            {pet.name}
-                                        </h3>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            {pet.breed} • {pet.species}
+                                {/* Pet Info */}
+                                <div className="flex-1 p-4">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                                {pet.name}
+                                            </h3>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                {pet.breed} • {pet.species}
+                                            </p>
+                                        </div>
+                                        <p className="text-lg font-bold text-teal-600 dark:text-teal-400">
+                                            ${pet.fee}
                                         </p>
                                     </div>
-                                    <p className="text-lg font-bold text-teal-600 dark:text-teal-400">
-                                        ${pet.fee}
-                                    </p>
-                                </div>
 
-                                <div className="flex flex-wrap gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400">
-                                    <div className="flex items-center gap-1">
-                                        <MapPin size={14} className="text-teal-500" />
-                                        {pet.location}
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Calendar size={14} className="text-teal-500" />
-                                        {pet.age}
-                                    </div>
-                                    {pet.vaccinated && (
-                                        <div className="flex items-center gap-1 text-green-600">
-                                            <Syringe size={14} />
-                                            Vaccinated
+                                    <div className="flex flex-wrap gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400">
+                                        <div className="flex items-center gap-1">
+                                            <MapPin size={14} className="text-teal-500" />
+                                            {pet.location}
                                         </div>
-                                    )}
-                                </div>
+                                        <div className="flex items-center gap-1">
+                                            <Calendar size={14} className="text-teal-500" />
+                                            {pet.age}
+                                        </div>
+                                        {pet.vaccinated && (
+                                            <div className="flex items-center gap-1 text-green-600">
+                                                <Syringe size={14} />
+                                                Vaccinated
+                                            </div>
+                                        )}
+                                    </div>
 
-                                {/* Action Buttons */}
-                                <div className="flex flex-wrap gap-2 mt-3">
-                                    <Button
-                                        size="sm"
-                                        variant="bordered"
-                                        onPress={() => handleViewRequests(pet)}
-                                        startContent={<MessageCircle size={14} />}
-                                        className="border-teal-500 text-teal-600"
-                                    >
-                                        Requests
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="bordered"
-                                        startContent={<Eye size={14} />}
-                                        className="border-blue-500 text-blue-600"
-                                    >
-                                        <Link href={`/all-pets/${pet._id}`}>View</Link>
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="bordered"
-                                        onClick={() => handleEditPet(pet)}
-                                        startContent={<Edit size={14} />}
-                                        className="border-amber-500 text-amber-600"
-                                    >
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="bordered"
-                                        onClick={() => handleDeleteClick(pet)}
-                                        startContent={<Trash2 size={14} />}
-                                        className="border-red-500 text-red-600"
-                                    >
-                                        Delete
-                                    </Button>
+                                    {/* Action Buttons */}
+                                    <div className="flex flex-wrap gap-2 mt-3">
+                                        <Button
+                                            size="sm"
+                                            variant="bordered"
+                                            onPress={() => handleViewRequests(pet)}
+                                            startContent={<MessageCircle size={14} />}
+                                            className="border-teal-500 text-teal-600"
+                                        >
+                                            Requests
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="bordered"
+                                            startContent={<Eye size={14} />}
+                                            className="border-blue-500 text-blue-600"
+                                        >
+                                            <Link href={`/all-pets/${pet._id}`}>View</Link>
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="bordered"
+                                            onClick={() => handleEditPet(pet)}
+                                            startContent={<Edit size={14} />}
+                                            className="border-amber-500 text-amber-600"
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="bordered"
+                                            onClick={() => handleDeleteClick(pet)}
+                                            startContent={<Trash2 size={14} />}
+                                            className="border-red-500 text-red-600"
+                                        >
+                                            Delete
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </Card>
-                ))}
+                        </Card>
+                    ))
+                )}
             </div>
 
-            {/* Empty State */}
-            {listings.length === 0 && (
+            {/* Empty State - Only show when not loading and no listings */}
+            {!isLoading && listings.length === 0 && (
                 <div className="text-center py-16">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                         <PawPrint size={40} className="text-gray-400" />
@@ -636,7 +655,14 @@ const MyListingsPage = () => {
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-6">
-                            {adoptions.length === 0 ? (
+                            {isRequestsLoading ? (
+                                // Show skeleton loaders while loading requests
+                                <>
+                                    <RequestSkeleton />
+                                    {/* <RequestSkeleton /> */}
+                                    {/* <RequestSkeleton /> */}
+                                </>
+                            ) : adoptions.length === 0 ? (
                                 <div className="text-center py-8">
                                     <p className="text-gray-500 dark:text-gray-400">No adoption requests yet.</p>
                                 </div>
