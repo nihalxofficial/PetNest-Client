@@ -187,7 +187,7 @@ const ProfilePage = () => {
                             <div className="flex flex-wrap items-center justify-between gap-4">
                                 <div>
                                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                        {profile.name}
+                                        {user?.name}
                                     </h2>
                                     <div className="flex items-center gap-2 mt-1">
                                         <Chip color="primary" variant="flat" size="sm" className="text-teal-600 dark:text-teal-400">
@@ -196,7 +196,7 @@ const ProfilePage = () => {
                                         </Chip>
                                         <div className="flex items-center gap-1 text-sm text-gray-500">
                                             <Calendar size={12} />
-                                            Member since {new Date(profile.joinDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                            Member since {new Date(user?.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                                         </div>
                                     </div>
                                 </div>
