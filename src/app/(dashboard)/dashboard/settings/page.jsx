@@ -24,8 +24,11 @@ import {
     Trash2,
     Heart,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 const SettingsPage = () => {
+    const { data: session } = authClient.useSession();
+    const user = session?.user;
     const [profileForm, setProfileForm] = useState({
         name: "John Doe",
         email: "john.doe@example.com",
@@ -84,7 +87,7 @@ const SettingsPage = () => {
                         {/* Avatar Section */}
                         <div className="flex flex-col items-center gap-3">
                             <Avatar
-                                src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=400"
+                                src={user?.image}
                                 name="JD"
                                 size="xl"
                                 className="ring-4 ring-teal-500/20"
@@ -108,7 +111,7 @@ const SettingsPage = () => {
                                         Full Name
                                     </label>
                                     <Input
-                                        value={profileForm.name}
+                                        value={user?.name}
                                         onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
                                         placeholder="Your name"
                                     />
@@ -120,7 +123,7 @@ const SettingsPage = () => {
                                     </label>
                                     <Input
                                         type="email"
-                                        value={profileForm.email}
+                                        value={user?.email}
                                         onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
                                         placeholder="Your email"
                                     />
