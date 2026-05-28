@@ -31,6 +31,7 @@ import {
     ShoppingBag,
     PlusCircle,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 // Hardcoded dashboard data
 const dashboardData = {
@@ -185,7 +186,7 @@ const StatusBadge = ({ status }) => {
 const ProgressBar = ({ value, color = "bg-green-500" }) => {
     return (
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2 overflow-hidden">
-            <div 
+            <div
                 className={`h-full rounded-full transition-all duration-500 ${color}`}
                 style={{ width: `${value}%` }}
             />
@@ -197,6 +198,9 @@ const DashboardPage = () => {
     const [data, setData] = useState(dashboardData);
     const [selectedTab, setSelectedTab] = useState("overview");
 
+    const { data: session, isPending } = authClient.useSession();
+    const user = session?.user;
+
     return (
         <div className="max-w-7xl mx-auto">
             {/* Welcome Section */}
@@ -204,18 +208,18 @@ const DashboardPage = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                            Welcome back, {data.user.name.split(" ")[0]}! 👋
+                            Welcome back, {user?.name}! 👋
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-1">
                             Here&apos;s what&apos;s happening with your pet adoption journey
                         </p>
                     </div>
-                    <Link href="/dashboard/add-pet">
-                        <Button className="bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-md hover:shadow-lg">
+                    <Button className="bg-linear-to-r from-teal-600 to-emerald-500 text-white shadow-md hover:shadow-lg">
+                        <Link href="/dashboard/add-pet" className="flex items-center">
                             <PlusCircle size={16} className="mr-2" />
                             Add New Pet
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                 </div>
             </div>
 
@@ -275,7 +279,7 @@ const DashboardPage = () => {
                             </div>
                         </div>
                         <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                            {new Date(data.user.memberSince).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                            {new Date(user?.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                         </p>
                         <p className="text-xs text-gray-500 mt-2">Active Member</p>
                     </div>
@@ -430,16 +434,16 @@ const DashboardPage = () => {
                             {/* Avatar Section */}
                             <div className="flex flex-col items-center gap-3">
                                 <Avatar
-                                    src={data.user.avatar}
-                                    name={data.user.name.charAt(0)}
+                                    src={user?.image}
+                                    name={user?.name}
                                     size="xl"
                                     className="ring-4 ring-teal-500/20"
                                 />
-                                <Link href="/dashboard/settings">
-                                    <Button size="sm" variant="bordered" className="border-teal-500 text-teal-600">
+                                <Button size="sm" variant="bordered" className="border-teal-500 text-teal-600">
+                                    <Link href="/dashboard/settings">
                                         Edit Profile
-                                    </Button>
-                                </Link>
+                                    </Link>
+                                </Button>
                             </div>
 
                             {/* User Info */}
@@ -450,14 +454,14 @@ const DashboardPage = () => {
                                             <User size={14} className="inline mr-1 text-teal-500" />
                                             Full Name
                                         </label>
-                                        <p className="text-gray-900 dark:text-white">{data.user.name}</p>
+                                        <p className="text-gray-900 dark:text-white">{user?.name}</p>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                                             <Mail size={14} className="inline mr-1 text-teal-500" />
                                             Email Address
                                         </label>
-                                        <p className="text-gray-900 dark:text-white">{data.user.email}</p>
+                                        <p className="text-gray-900 dark:text-white">{user?.email}</p>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">

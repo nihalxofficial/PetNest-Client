@@ -34,6 +34,7 @@ import {
 import { FiInstagram } from "react-icons/fi";
 import { FaLinkedin } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
+import { authClient } from "@/lib/auth-client";
 
 // Hardcoded profile data
 const profileData = {
@@ -96,6 +97,10 @@ const profileData = {
 const ProfilePage = () => {
     const [profile, setProfile] = useState(profileData);
     const [isEditing, setIsEditing] = useState(false);
+
+    const { data: session } = authClient.useSession();
+    const user = session?.user;
+
     const [editForm, setEditForm] = useState({
         name: profile.name,
         email: profile.email,
@@ -163,7 +168,7 @@ const ProfilePage = () => {
                         <Camera size={16} className="text-white" />
                     </button>
                 </div>
-                
+
                 {/* Avatar Section */}
                 <div className="relative px-6 pb-6">
                     <div className="flex flex-col md:flex-row items-start md:items-end gap-4 -mt-12">
