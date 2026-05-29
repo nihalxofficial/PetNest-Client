@@ -1,10 +1,13 @@
 <div align="center">
 
+# 🐾 PetNest
+
 <img src="https://img.shields.io/badge/PetNest-Live-brightgreen?style=for-the-badge" alt="Live">
 <img src="https://img.shields.io/badge/Stack-MERN%20%2B%20Next.js-blue?style=for-the-badge" alt="Stack">
 <img src="https://img.shields.io/badge/Auth-Better%20Auth%20%2B%20JWT-orange?style=for-the-badge" alt="Auth">
+<img src="https://img.shields.io/badge/Docker-Containerised-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
 
-# 🐾 PetNest
+
 
 ### *Find your perfect companion. Give them a forever home.*
 
@@ -60,6 +63,14 @@ PetNest is a real-world pet adoption portal that connects animal lovers with she
 | CORS | Cross-origin request configuration |
 | dotenv | Environment variable management |
 
+### DevOps & Deployment
+| Technology | Purpose |
+|---|---|
+| Docker | Containerising client and server apps |
+| Docker Compose | Multi-container orchestration |
+| Docker Hub | Public image registry for distribution |
+| Vercel | Frontend & backend cloud deployment |
+
 ---
 
 ## 🗂️ How PetNest Works — Core User Flows
@@ -111,12 +122,12 @@ npm install jose-cjs
 ```ts
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { jwt } from "better-auth/plugins";  // ← jwt plugin
+import { jwt } from "better-auth/plugins";
 import clientPromise from "./mongodb";
 
 export const auth = betterAuth({
   database: mongodbAdapter(await clientPromise.then(c => c.db())),
-  plugins: [jwt()], // ← required for auth.api.getToken() to work
+  plugins: [jwt()],
   emailAndPassword: { enabled: true },
   socialProviders: {
     google: {
@@ -134,21 +145,19 @@ export const auth = betterAuth({
 
 ```ts
 import { createAuthClient } from "better-auth/react";
-import { jwtClient } from "better-auth/client/plugins"; // ← jwtClient, not bearerClient
+import { jwtClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_SERVER_URL!,
-  plugins: [jwtClient()], // ← required for authClient.token() to work
+  plugins: [jwtClient()],
 });
 ```
 
-> ⚠️ The `jwtClient()` plugin is **required** on the client. Without it, `authClient.token()` will return `null` or fail silently. It must match the `jwt()` plugin used on the server.
+> ⚠️ The `jwtClient()` plugin is **required** on the client. Without it, `authClient.token()` will return `null` or fail silently.
 
 ---
 
-### 1. Getting the Token — Client Side (React Component)
-
-In client components, use `authClient.token()` to retrieve the JWT. Store it in state so it's available for authenticated API calls:
+### 1. Getting the Token — Client Side
 
 ```js
 import { useState, useEffect } from "react";
@@ -157,17 +166,14 @@ import { authClient } from "@/lib/auth-client";
 export default function SomeProtectedComponent() {
   const [token, setToken] = useState(null);
 
-  // ─── Get JWT token once on mount ─────────────────────────────────────────
   useEffect(() => {
     const getToken = async () => {
       const { data: jwtData } = await authClient.token();
-      const token = jwtData?.token;
       setToken(jwtData?.token);
     };
     getToken();
   }, []);
 
-  // Use token in your API calls
   const fetchProtectedData = async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/pets`, {
       headers: {
@@ -176,16 +182,10 @@ export default function SomeProtectedComponent() {
     });
     return res.json();
   };
-
-  // ...
 }
 ```
 
----
-
-### 2. Getting the Token — Server Side (Next.js Server Component / Route Handler)
-
-In server components or API route handlers, use `auth.api.getToken()` with the incoming request headers:
+### 2. Getting the Token — Server Side
 
 ```ts
 import { auth } from "@/lib/auth";
@@ -193,14 +193,13 @@ import { headers } from "next/headers";
 
 export async function GET() {
   const { token } = await auth.api.getToken({
-    headers: await headers(), //   passes cookies/auth headers from the request
+    headers: await headers(),
   });
 
   if (!token) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // Use token to call your Express backend
   const res = await fetch(`${process.env.SERVER_URL}/pets`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -212,11 +211,7 @@ export async function GET() {
 }
 ```
 
----
-
-### 3. Backend — Verifying the Token (Middleware)
-
-The Express backend verifies the JWT from the `Authorization` header on every protected route:
+### 3. Backend — Verifying the Token
 
 ```js
 // middleware/verifyToken.js
@@ -224,7 +219,7 @@ const jwt = require('jsonwebtoken');
 
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized: No token found' });
@@ -232,7 +227,7 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // attach decoded payload to request
+    req.user = decoded;
     next();
   } catch (err) {
     return res.status(403).json({ message: 'Forbidden: Invalid or expired token' });
@@ -242,35 +237,26 @@ const verifyToken = (req, res, next) => {
 module.exports = verifyToken;
 ```
 
----
-
-### 4. Protecting Private Routes
+### 4. Protecting Routes
 
 ```js
-// routes/pets.js
 const verifyToken = require('../middleware/verifyToken');
 
-// Any route using verifyToken is protected
 router.post('/pets', verifyToken, async (req, res) => {
-  // Only reaches here if JWT is valid
   const pet = await Pet.create({ ...req.body, ownerEmail: req.user.email });
   res.status(201).json(pet);
 });
 
 router.post('/adoptions', verifyToken, async (req, res) => {
-  // req.user.email is available from the decoded JWT
   const request = await Adoption.create({ ...req.body, userEmail: req.user.email });
   res.status(201).json(request);
 });
 ```
 
-### 5. Logout — Clearing the Session
-
-Better Auth handles session destruction on logout. Call `authClient.signOut()` on the client:
+### 5. Logout
 
 ```js
 await authClient.signOut();
-// Redirect to home or login page
 ```
 
 ---
@@ -280,27 +266,27 @@ await authClient.signOut();
 ```
 PetNest-Client/
 ├── app/
-│   ├── (main)/              # Public layout
-│   │   ├── page.jsx         # Home page
-│   │   ├── all-pets/        # Browse pets
-│   │   └── pets/[id]/       # Pet details + adoption form
-│   ├── (dashboard)/         # Protected dashboard
+│   ├── (main)/
+│   │   ├── page.jsx
+│   │   ├── all-pets/
+│   │   └── pets/[id]/
+│   ├── (dashboard)/
 │   │   ├── my-requests/
 │   │   ├── add-pet/
 │   │   └── my-listings/
 │   └── login/ register/
 ├── components/
 ├── lib/
-│   ├── auth.ts              # Better Auth server config (with bearer plugin)
-│   └── auth-client.ts       # Better Auth client config (with bearerClient plugin)
+│   ├── auth.ts
+│   └── auth-client.ts
 └── public/
 
 PetNest-Server/
 ├── routes/
-│   ├── pets.js              # CRUD for pets
-│   └── adoptions.js         # Adoption request logic
+│   ├── pets.js
+│   └── adoptions.js
 ├── middleware/
-│   └── verifyToken.js       # JWT verification middleware
+│   └── verifyToken.js
 ├── models/
 └── index.js
 ```
@@ -359,6 +345,116 @@ npm run dev   # starts on :3000
 
 ---
 
+## 🐳 Docker Setup
+
+PetNest is fully containerised. You can run the entire stack locally using Docker without installing Node.js or any dependencies.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) installed
+- [Docker Compose](https://docs.docker.com/compose/install/) installed
+
+Verify with:
+```bash
+docker version
+docker compose version
+```
+
+---
+
+### Option 1 — Pull images from Docker Hub *(recommended)*
+
+No need to clone the repo. Just create these two files and run.
+
+**Step 1 — Create `docker-compose.yml`**
+```yaml
+version: "3.9"
+
+services:
+  client:
+    image: nihalxofficial/petnest-client:v1
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./client.env
+    depends_on:
+      - server
+    networks:
+      - petnest-net
+
+  server:
+    image: nihalxofficial/petnest-server:v1
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server.env
+    networks:
+      - petnest-net
+
+networks:
+  petnest-net:
+    driver: bridge
+```
+
+**Step 2 — Create `client.env`**
+```env
+NEXT_PUBLIC_SERVER_URL=http://localhost:5000
+BETTER_AUTH_SECRET=your_better_auth_secret
+BETTER_AUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+**Step 3 — Create `server.env`**
+```env
+MONGODB_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_jwt_secret_key
+CLIENT_URL=http://localhost:3000
+PORT=5000
+```
+
+**Step 4 — Pull and run**
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Visit **http://localhost:3000** 🎉
+
+---
+
+### Option 2 — Build from source
+
+```bash
+# Clone both repos into the same folder
+git clone https://github.com/nihalxofficial/PetNest-Client petnest
+git clone https://github.com/nihalxofficial/PetNest-Server petnest-server
+
+# Add your env files (see Environment Variables section above)
+# petnest/.env.local
+# petnest-server/.env
+
+# Build and start
+docker compose up --build
+```
+
+---
+
+### Useful Docker commands
+
+| Command | Description |
+|---|---|
+| `docker compose up -d` | Start all containers in the background |
+| `docker compose down` | Stop and remove containers |
+| `docker compose logs -f` | Watch live logs from all containers |
+| `docker compose logs -f client` | Watch client logs only |
+| `docker compose logs -f server` | Watch server logs only |
+| `docker compose ps` | Check container status |
+| `docker compose up --build` | Rebuild images and start |
+| `docker compose pull` | Pull latest images from Docker Hub |
+
+---
+
 ## 📦 NPM Packages Used
 
 ### Client
@@ -377,6 +473,8 @@ npm run dev   # starts on :3000
 | 🖥️ API Server | https://petnest-server-sepia.vercel.app/ |
 | 📁 Client Repo | https://github.com/nihalxofficial/PetNest-Client |
 | 📁 Server Repo | https://github.com/nihalxofficial/PetNest-Server |
+| 🐳 Docker Hub (Client) | https://hub.docker.com/r/nihalxofficial/petnest-client |
+| 🐳 Docker Hub (Server) | https://hub.docker.com/r/nihalxofficial/petnest-server |
 
 ---
 
