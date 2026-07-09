@@ -2,96 +2,115 @@
 
 # 🐾 PetNest
 
-<img src="https://img.shields.io/badge/PetNest-Live-brightgreen?style=for-the-badge" alt="Live">
-<img src="https://img.shields.io/badge/Stack-MERN%20%2B%20Next.js-blue?style=for-the-badge" alt="Stack">
-<img src="https://img.shields.io/badge/Auth-Better%20Auth%20%2B%20JWT-orange?style=for-the-badge" alt="Auth">
-<img src="https://img.shields.io/badge/Docker-Containerised-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
-
-
-
 ### *Find your perfect companion. Give them a forever home.*
 
-A full-stack Pet Adoption Platform where users can explore pets, submit adoption requests and manage listings — all with secure authentication and a beautiful responsive UI.
+**A full-stack Pet Adoption Platform where users can explore pets, submit adoption requests, and manage listings — all with secure authentication and a beautiful responsive UI.**
 
-[🌐 Live Site](https://petnest-olive.vercel.app/) · [🖥️ Server](https://petnest-server-sepia.vercel.app/) · [📁 Client Repo](https://github.com/nihalxofficial/PetNest-Client) · [📁 Server Repo](https://github.com/nihalxofficial/PetNest-Server)
+[![Live Site](https://img.shields.io/badge/Live-Site-2ea44f?style=for-the-badge)](https://petnest-olive.vercel.app/)
+[![Client Repo](https://img.shields.io/badge/Client-Repo-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/nihalxofficial/PetNest-Client)
+[![Server Repo](https://img.shields.io/badge/Server-Repo-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/nihalxofficial/PetNest-Server)
+[![Docker](https://img.shields.io/badge/Docker-Images-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/nihalxofficial/petnest-client)
 
 </div>
 
----
+<!-- 📸 Add a banner screenshot or GIF of the app here -->
+<img width="1356" height="2008" alt="Petnest-Home" src="https://github.com/user-attachments/assets/ce97ebb4-d815-41dd-8ca0-ab55c011bd1a" />
 
-## 📌 Purpose
-
-PetNest is a real-world pet adoption portal that connects animal lovers with shelters and individual pet owners. Users can browse available pets, view detailed profiles and submit adoption requests. Pet owners/shelters can manage their listings and handle incoming adoption requests — all within a clean, secure and responsive interface.
 
 ---
 
-## ✨ Features
+## 📑 Table of Contents
 
-- 🐶 **Browse & Search Pets** — Explore all available pets with search by name, filter by species and sorted listings using MongoDB `$regex` and `$in` operators
-- 🔐 **Secure Authentication** — Email/password and Google OAuth login powered by Better Auth with JWT stored in HTTPOnly cookies
-- 📋 **Adoption Request System** — Authenticated users can submit adoption requests with pickup dates; only one request per pet can be approved
-- 🏠 **Owner Dashboard** — Pet owners can add, edit, delete listings and approve or reject incoming adoption requests
-- 📱 **Fully Responsive Design** — Mobile, tablet and desktop layouts with Dark/Light theme toggle
-- 🔒 **Protected Routes** — Private routes stay accessible on reload; logged-in users are never unexpectedly redirected to login
-- ✅ **Adoption Control** — Pet owners cannot adopt their own pets; once a request is approved the pet is marked as adopted and no further requests are accepted
-- 🎞️ **Smooth Animations** — Framer Motion transitions throughout the app for a polished experience
+- [About](#-about)
+- [Project Overview](#-project-overview)
+  - [Objective](#objective)
+  - [Target Audience](#target-audience)
+  - [Platforms Used](#platforms-used)
+  - [Deployments](#deployments)
+- [Key Features](#-key-features)
+- [User Flows](#️-user-flows)
+- [Authentication Flow (JWT + Better Auth)](#-authentication-flow-jwt--better-auth)
+- [Tech Stack](#️-tech-stack)
+- [npm Packages Used](#-npm-packages-used)
+- [Environment Variables](#-environment-variables)
+- [Getting Started](#-getting-started-without-docker)
+- [Running with Docker](#-running-with-docker)
+- [Roadmap](#️-roadmap)
+- [License](#-license)
 
 ---
 
-## 🛠️ Tech Stack
+## 📖 About
 
-### Frontend
-| Technology | Purpose |
+PetNest is a real-world pet adoption portal that connects animal lovers with shelters and individual pet owners. Instead of a static listing page with a "contact owner" button, PetNest treats adoption as an actual workflow — with requests, statuses, and safeguards on both sides.
+
+**What makes it different from a typical pet-listing clone:**
+
+- **Real adoption request lifecycle** — adopters submit a request with a preferred pickup date and track it (Pending / Approved / Rejected) from a dedicated dashboard, instead of just messaging an owner.
+- **Ownership safeguards built in** — owners can't submit requests for their own pets, and once a request is approved the pet is automatically locked from further requests, enforced on both client and server.
+- **Secure, invisible auth** — Better Auth issues JWTs stored in HTTPOnly cookies (email/password + Google OAuth), with every protected route verifying the cookie before processing the request.
+- **Shipped like a real product** — fully containerized with Docker (published images for both client and server) and deployed live, not just run locally.
+
+---
+
+## 🎯 Project Overview
+
+### Objective
+To design and build a complete pet adoption platform — from public browsing and search, through authenticated adoption requests, to owner-side listing and request management — while practicing secure authentication, request-state workflows, and containerized deployment.
+
+### Target Audience
+- **Adopters** looking to browse, search, and adopt pets online.
+- **Pet Owners / Shelters** who want a simple way to list pets and manage incoming adoption requests.
+- **Developers / Recruiters** reviewing this project as a demonstration of full-stack, auth-secured application development.
+
+### Platforms Used
+- **Frontend:** React + Next.js, Tailwind CSS, HeroUI
+- **Backend:** Node.js + Express
+- **Database:** MongoDB Atlas
+- **Auth:** Better Auth (JWT plugin) with Google OAuth
+- **Containerization:** Docker + Docker Compose, images published to Docker Hub
+- **Hosting:** Vercel (client + server)
+
+### Deployments
+| Resource | Link |
 |---|---|
-| React + Next.js | UI framework & SSR/routing |
-| Tailwind CSS | Utility-first styling |
-| Hero UI | Component library |
-| Framer Motion | Animations & transitions |
-| React Icons / Lucide React / Gravity UI Icons | Icon sets |
-| React Toast | Toast notifications |
-| Marquee | Scrolling banner component |
-| JavaScript ES6+ | Core scripting |
-
-### Backend
-| Technology | Purpose |
-|---|---|
-| Node.js + Express | REST API server |
-| MongoDB Atlas | Cloud database |
-| Better Auth | Authentication provider |
-| JWT (jsonwebtoken) | Stateless session tokens |
-| Cookie-parser | HTTPOnly cookie handling |
-| CORS | Cross-origin request configuration |
-| dotenv | Environment variable management |
-
-### DevOps & Deployment
-| Technology | Purpose |
-|---|---|
-| Docker | Containerising client and server apps |
-| Docker Compose | Multi-container orchestration |
-| Docker Hub | Public image registry for distribution |
-| Vercel | Frontend & backend cloud deployment |
+| 🌐 Live Site | [petnest-olive.vercel.app](https://petnest-olive.vercel.app/) |
+| 📁 Client Repo | [PetNest-Client](https://github.com/nihalxofficial/PetNest-Client) |
+| 📁 Server Repo | [PetNest-Server](https://github.com/nihalxofficial/PetNest-Server) |
+| 🐳 Client Docker Image | [nihalxofficial/petnest-client](https://hub.docker.com/r/nihalxofficial/petnest-client) |
+| 🐳 Server Docker Image | [nihalxofficial/petnest-server](https://hub.docker.com/r/nihalxofficial/petnest-server) |
 
 ---
 
-## 🗂️ How PetNest Works — Core User Flows
+## ✨ Key Features
+
+> Only the features that set PetNest apart are listed here — standard auth/CRUD basics are covered later in the docs.
+
+- **Adoption Request Lifecycle** — authenticated users submit requests with a preferred pickup date; status (Pending / Approved / Rejected) is tracked live on the "My Requests" dashboard.
+- **Adoption Lock & Ownership Guard** — pet owners cannot adopt their own pets; once a request is approved, the pet is auto-marked as adopted and further requests are disabled.
+- **Owner Dashboard** — add, edit, or delete listings, and approve/reject incoming adoption requests per pet, all from one place.
+- **Secure Authentication** — email/password and Google OAuth via Better Auth, with JWT stored in HTTPOnly cookies (invisible to JavaScript, resistant to XSS).
+- **Persistent Protected Routes** — private routes stay accessible on reload; logged-in users are never unexpectedly bounced back to login.
+- **Fully Responsive, Animated UX** — Framer Motion transitions and a dark/light theme toggle across mobile, tablet, and desktop.
+
+---
+
+## 🗂️ User Flows
 
 ### 🐾 For Adopters
-
-1. **Register / Login** — Sign up with email & password or continue with Google OAuth.
-2. **Browse Pets** — Visit the All Pets page to search by name or filter by species. Each card shows key info at a glance.
-3. **View Pet Profile** — Click any pet to see their full profile: photos, description, age, species and owner details.
-4. **Submit Adoption Request** — Authenticated users can fill in a short form including their preferred pickup date and submit a request.
-5. **Track Requests** — The "My Requests" dashboard shows all submitted requests along with their current status (Pending / Approved / Rejected).
+1. **Register / Login** — sign up with email & password or continue with Google OAuth.
+2. **Browse Pets** — search by name or filter by species on the All Pets page.
+3. **View Pet Profile** — see full details: photos, description, age, species, and owner info.
+4. **Submit Adoption Request** — fill in a short form with a preferred pickup date and submit.
+5. **Track Requests** — the "My Requests" dashboard shows all submitted requests and their current status.
 
 ### 🏠 For Pet Owners / Shelters
-
-1. **Add a Listing** — Use the "Add Pet" form to create a new listing with photos, name, species, age and description.
-2. **Manage Listings** — Edit or delete any of your active listings from the "My Listings" dashboard.
-3. **Handle Requests** — View incoming adoption requests per pet and approve or reject them individually.
-4. **Adoption Lock** — Once a request is approved, the pet is automatically marked as adopted and further requests are disabled.
+1. **Add a Listing** — use the "Add Pet" form with photos, name, species, age, and description.
+2. **Manage Listings** — edit or delete active listings from the "My Listings" dashboard.
+3. **Handle Requests** — view incoming adoption requests per pet and approve or reject individually.
+4. **Adoption Lock** — once a request is approved, the pet is automatically marked adopted and further requests are disabled.
 
 ### 🔐 Authentication & Authorization
-
 - Better Auth handles the full auth lifecycle (sign up, sign in, session management, Google OAuth).
 - On login, the server issues a JWT stored in an HTTPOnly cookie — invisible to JavaScript, resistant to XSS attacks.
 - Every protected API route verifies the cookie before processing the request.
@@ -99,9 +118,9 @@ PetNest is a real-world pet adoption portal that connects animal lovers with she
 
 ---
 
-## 🔐 JWT Authentication Flow
+## 🔑 Authentication Flow (JWT + Better Auth)
 
-### How It Works — End to End
+**How it works, end to end:**
 
 ```
 User Login (Better Auth) → authClient.token() / auth.api.getToken() → JWT from Better Auth → Sent in Authorization header to Express → Middleware verifies token → Private route access granted
@@ -109,7 +128,7 @@ User Login (Better Auth) → authClient.token() / auth.api.getToken() → JWT fr
 
 ### Setting Up Better Auth
 
-Better Auth must be configured on both the client and server sides before token retrieval works. PetNest uses the **`jwt()` plugin** (backed by [`jose-cjs`](https://www.npmjs.com/package/jose-cjs)) which handles signing and verifying JWTs natively within Better Auth — no manual `jwt.sign()` call needed.
+Better Auth must be configured on both the client and server before token retrieval works. PetNest uses the **`jwt()` plugin** (backed by [`jose-cjs`](https://www.npmjs.com/package/jose-cjs)), which handles signing and verifying JWTs natively within Better Auth — no manual `jwt.sign()` call needed.
 
 Install the peer dependency first:
 
@@ -157,7 +176,7 @@ export const authClient = createAuthClient({
 
 ---
 
-### 1. Getting the Token — Client Side
+#### 1. Getting the Token — Client Side
 
 ```js
 import { useState, useEffect } from "react";
@@ -185,7 +204,7 @@ export default function SomeProtectedComponent() {
 }
 ```
 
-### 2. Getting the Token — Server Side
+#### 2. Getting the Token — Server Side
 
 ```ts
 import { auth } from "@/lib/auth";
@@ -211,7 +230,7 @@ export async function GET() {
 }
 ```
 
-### 3. Backend — Verifying the Token
+#### 3. Backend — Verifying the Token
 
 ```js
 // middleware/verifyToken.js
@@ -237,7 +256,7 @@ const verifyToken = (req, res, next) => {
 module.exports = verifyToken;
 ```
 
-### 4. Protecting Routes
+#### 4. Protecting Routes
 
 ```js
 const verifyToken = require('../middleware/verifyToken');
@@ -253,7 +272,7 @@ router.post('/adoptions', verifyToken, async (req, res) => {
 });
 ```
 
-### 5. Logout
+#### 5. Logout
 
 ```js
 await authClient.signOut();
@@ -261,60 +280,67 @@ await authClient.signOut();
 
 ---
 
-## 📁 Project Structure
+## 🛠️ Tech Stack
 
-```
-PetNest-Client/
-├── app/
-│   ├── (main)/
-│   │   ├── page.jsx
-│   │   ├── all-pets/
-│   │   └── pets/[id]/
-│   ├── (dashboard)/
-│   │   ├── my-requests/
-│   │   ├── add-pet/
-│   │   └── my-listings/
-│   └── login/ register/
-├── components/
-├── lib/
-│   ├── auth.ts
-│   └── auth-client.ts
-└── public/
+### Frontend
+| Technology | Purpose |
+|---|---|
+| React + Next.js | UI framework & SSR/routing |
+| Tailwind CSS | Utility-first styling |
+| Hero UI | Component library |
+| Framer Motion | Animations & transitions |
+| React Icons / Lucide React / Gravity UI Icons | Icon sets |
+| React Toast | Toast notifications |
+| Marquee | Scrolling banner component |
+| JavaScript ES6+ | Core scripting |
 
-PetNest-Server/
-├── routes/
-│   ├── pets.js
-│   └── adoptions.js
-├── middleware/
-│   └── verifyToken.js
-├── models/
-└── index.js
-```
+### Backend
+| Technology | Purpose |
+|---|---|
+| Node.js + Express | REST API server |
+| MongoDB Atlas | Cloud database |
+| Better Auth | Authentication provider |
+| JWT (jsonwebtoken) | Stateless session tokens |
+| Cookie-parser | HTTPOnly cookie handling |
+| CORS | Cross-origin request configuration |
+| dotenv | Environment variable management |
+
+### DevOps & Deployment
+| Technology | Purpose |
+|---|---|
+| Docker | Containerising client and server apps |
+| Docker Compose | Multi-container orchestration |
+| Docker Hub | Public image registry for distribution |
+| Vercel | Frontend & backend cloud deployment |
 
 ---
 
-## 🚀 Getting Started Locally
+## 📦 npm Packages Used
 
-### Prerequisites
-- Node.js v18+
-- MongoDB Atlas account
-- Better Auth credentials
+| Package | Purpose |
+|---|---|
+| `next` | React framework with App Router, SSR, and routing |
+| `react` / `react-dom` | Core UI library |
+| `@heroui/react` | Component library |
+| `tailwindcss` | Utility-first CSS framework |
+| `framer-motion` | Animations & transitions |
+| `react-icons` | Icon library |
+| `lucide-react` | Additional icon set |
+| `@gravity-ui/icons` | Icon set (Gravity UI) |
+| `react-hot-toast` | Toast notifications |
+| `react-fast-marquee` | Scrolling banner component |
+| `better-auth` | Authentication (JWT, social login) |
+| `express` | REST API server (backend) |
+| `mongoose` | MongoDB object modeling (backend) |
+| `jsonwebtoken` | JWT signing/verification (backend) |
+| `cookie-parser` | HTTPOnly cookie handling (backend) |
+| `cors` | Cross-origin request configuration (backend) |
+| `dotenv` | Environment variable management (backend) |
+| `jose-cjs` | JWT signing peer dependency for Better Auth (backend) |
 
-### Clone & Install
+---
 
-```bash
-# Client
-git clone https://github.com/nihalxofficial/PetNest-Client
-cd PetNest-Client
-npm install
-
-# Server
-git clone https://github.com/nihalxofficial/PetNest-Server
-cd PetNest-Server
-npm install
-```
-
-### Environment Variables
+## 🔑 Environment Variables
 
 **Client `.env.local`**
 ```env
@@ -333,24 +359,37 @@ CLIENT_URL=http://localhost:3000
 PORT=5000
 ```
 
-### Run
-
-```bash
-# Server
-npm run dev   # starts on :5000
-
-# Client (separate terminal)
-npm run dev   # starts on :3000
-```
+> Never commit `.env` / `.env.local` to version control.
 
 ---
 
-## 🐳 Docker Setup
+## 🚀 Getting Started (Without Docker)
+
+```bash
+# Client
+git clone https://github.com/nihalxofficial/PetNest-Client
+cd PetNest-Client
+npm install
+npm run dev   # starts on :3000
+```
+
+```bash
+# Server (separate terminal)
+git clone https://github.com/nihalxofficial/PetNest-Server
+cd PetNest-Server
+npm install
+npm run dev   # starts on :5000
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🐳 Running with Docker
 
 PetNest is fully containerised. You can run the entire stack locally using Docker without installing Node.js or any dependencies.
 
 ### Prerequisites
-
 - [Docker](https://docs.docker.com/get-docker/) installed
 - [Docker Compose](https://docs.docker.com/compose/install/) installed
 
@@ -360,9 +399,7 @@ docker version
 docker compose version
 ```
 
----
-
-### Option 1 — Pull images from Docker Hub *(recommended)*
+### Option A — Pull images from Docker Hub *(recommended)*
 
 No need to clone the repo. Just create these two files and run.
 
@@ -419,11 +456,9 @@ docker compose pull
 docker compose up -d
 ```
 
-Visit **http://localhost:3000** 🎉
+Visit **[http://localhost:3000](http://localhost:3000)** 🎉
 
----
-
-### Option 2 — Build from source
+### Option B — Build from source
 
 ```bash
 # Clone both repos into the same folder
@@ -438,9 +473,7 @@ git clone https://github.com/nihalxofficial/PetNest-Server petnest-server
 docker compose up --build
 ```
 
----
-
-### Useful Docker commands
+### Useful Docker Commands
 
 | Command | Description |
 |---|---|
@@ -455,35 +488,25 @@ docker compose up --build
 
 ---
 
-## 📦 NPM Packages Used
+## 🗺️ Roadmap
 
-### Client
-`next` · `react` · `tailwindcss` · `@heroui/react` · `framer-motion` · `react-icons` · `lucide-react` · `@gravity-ui/icons` · `react-hot-toast` · `react-fast-marquee` · `better-auth`
-
-### Server
-`express` · `mongoose` · `jsonwebtoken` · `cookie-parser` · `cors` · `dotenv` · `better-auth` · `jose-cjs`
-
----
-
-## 🌐 Live Links
-
-| Resource | URL |
-|---|---|
-| 🌍 Live Site | https://petnest-olive.vercel.app/ |
-| 🖥️ API Server | https://petnest-server-sepia.vercel.app/ |
-| 📁 Client Repo | https://github.com/nihalxofficial/PetNest-Client |
-| 📁 Server Repo | https://github.com/nihalxofficial/PetNest-Server |
-| 🐳 Docker Hub (Client) | https://hub.docker.com/r/nihalxofficial/petnest-client |
-| 🐳 Docker Hub (Server) | https://hub.docker.com/r/nihalxofficial/petnest-server |
+<!-- Optional: list planned improvements -->
+- [ ] In-app messaging between adopters and owners
+- [ ] Wishlist / favorites for adopters
+- [ ] Multi-image upload per listing
+- [ ] Email notifications for adoption request status changes
+- [ ] Map-based pet search by location
 
 ---
 
-## 📜 License
+## 📄 License
 
-This project was built as part of an academic assignment. Feel free to explore the code for learning purposes.
+This project is licensed under the MIT License.
 
 ---
 
 <div align="center">
+
 Made with ❤️ by <a href="https://github.com/nihalxofficial">nihalxofficial</a>
+
 </div>
